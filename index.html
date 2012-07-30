@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 	<head>
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
 		<title>BNA</title>
@@ -18,11 +18,31 @@
 		<!--<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>-->
 	</head>
 	<body>
-        <section id="page1" data-role="page">
-            <header data-role="header"><h1>BNA</h1></header>
+        <section id="page1" data-role="page" data-fullscreen="true">
+            <header data-role="header" ZZdata-position="fixed"><h1>BNA</h1></header>
             <div class="content" data-role="content">
-                <p>This is the first page?</p>
-                <a href="#page2">Page 2</a>
+                <p></p>
+                <div data-role="fieldcontain">
+                    <label for="select-depart" id="">Select Departing Station</label>
+                    <select id="select-depart" name="select-depart">
+                        <option value="Concord">North Concord</option>
+                        <option value="Concord">Concord</option>
+                        <option value="Concord">Pleasant Hill</option>
+                    </select>
+                </div>
+
+
+
+                <div data-role="fieldcontain">
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <legend>Alarm:</legend>
+                        <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
+                               <label for="radio-alarm-on" >On</label>
+                        <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
+                               <label for="radio-alarm-off" >Off</label>
+                   </fieldset>
+                </div>
+                <!--<a href="#page2">Page 2</a>-->
             </div>
             <footer data-role="footer"><h1>MTS</h1></footer>
         </section>
@@ -32,7 +52,7 @@
             <div class="content" data-role="content">
                 <p>This is the second page?</p>
             </div>
-            <footer data-role="footer"><h1>MTS</h1></footer>
+            <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
         </section>
 	</body>
 </html>
