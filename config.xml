@@ -4,10 +4,11 @@
 	id		= "com.phonegap.getting.started"
 	version 	= "1.0.0">
 
-	<name>PhoneGap: Haneys First App</name>
+	<name>BNA Application</name>
 
 	<description>
-		My test app in git from https://build.phonegap.com/docs/start
+		My BNA application from git at https://github.com/haneyman/bna.git
+        Based on PhoneGap Build - so no .jar's or phonegap js.
 	</description>
 
 	<author href="http://blah.com"
