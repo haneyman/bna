@@ -22,35 +22,63 @@
             <header data-role="header" ZZdata-position="fixed"><h1>BNA</h1></header>
             <div class="content" data-role="content">
                 <p></p>
+                <div style="float:right">
+                    <a href="#pageMap"  data-rel="dialog">BART Map</a>
+                </div>
                 <div data-role="fieldcontain">
-                    <label for="select-depart" id="">Select Departing Station</label>
+                    <label for="select-depart" >Select Departing Station</label>
                     <select id="select-depart" name="select-depart">
-                        <option value="Concord">North Concord</option>
+                        <option value="North Concord">North Concord</option>
                         <option value="Concord">Concord</option>
-                        <option value="Concord">Pleasant Hill</option>
+                        <option value="Pleasant Hill">Pleasant Hill</option>
                     </select>
                 </div>
-
+                <div data-role="fieldcontain">
+                    <label for="select-arrive" >Select Arriving Station</label>
+                    <select id="select-arrive" name="select-arrive">
+                        <option value="Montgomery">Montgomery</option>
+                        <option value="Civic Center">Civic Center</option>
+                        <option value="Balboa">Balboa</option>
+                    </select>
+                </div>
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
+                    <label for="radio-alarmtype-noise">Alarm</label>
+                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
+                    <label for="radio-alarmtype-vibrate">Vibrate</label>
+                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
+                    <label for="radio-alarmtype-both">Alarm and Vibrate</label>
+                </fieldset>
 
 
                 <div data-role="fieldcontain">
                     <fieldset data-role="controlgroup" data-type="horizontal">
-                        <legend>Alarm:</legend>
+                        <!--<legend>Alarm:</legend>-->
                         <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
-                               <label for="radio-alarm-on" >On</label>
+                               <label for="radio-alarm-on" >Alarm ON</label>
                         <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
-                               <label for="radio-alarm-off" >Off</label>
+                               <label for="radio-alarm-off" >Alarm OFF</label>
                    </fieldset>
                 </div>
+
+
+                <div id="timeRemaining" style="border: solid #828282; border-radius: 15px; overflow: hidden;text-align: center">
+                    Projected Arrival Time
+                    <br />
+                    <span style="font-size: 32px;">4:34</span>
+                </div>
+
+                <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
+
                 <!--<a href="#page2">Page 2</a>-->
             </div>
             <footer data-role="footer"><h1>MTS</h1></footer>
         </section>
 
-        <section id="page2" data-role="page">
+        <section id="pageMap" data-role="page">
             <header data-role="header"><h1>BNA 2</h1></header>
             <div class="content" data-role="content">
-                <p>This is the second page?</p>
+                <p><img src="assets/img/system-map.gif"></p>
             </div>
             <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
         </section>
