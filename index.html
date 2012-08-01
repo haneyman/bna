@@ -16,6 +16,143 @@
 		<!--<script src="assets/js/lawnchair/Lawnchair.js" type="text/javascript" charset="utf-8"></script>-->
 		<!--<script src="assets/js/dsl.js" type="text/javascript" charset="utf-8"></script>-->
 		<!--<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>-->
+        <script type="text/javascript">
+            var isAlarmOn = false; //off, on, ??
+            var alarmType = 0; //0=none, 1=alarm, 2=vibrate, 3=both
+            var stationDepart = "";
+            var stationArrive = "";
+
+            $(document).ready(function(){
+                $("[name=radio-alarm-state]").change(function() {
+                    isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
+                    log("Alarm switched to " + isAlarmOn);
+                    if (isAlarmOn)
+                        turnAlarmOn();
+                });
+
+                $("[name=radio-alarmtype]").change(function() {
+                    if ( $('#radio-alarmtype-noise').attr("checked")=="checked")
+                        alarmType = 1;
+                    else if ( $('#radio-alarmtype-vibrate').attr("checked")=="checked")
+                        alarmType = 2;
+                    else
+                        alarmType = 3;
+                    log("Alarm type is now " + alarmType);
+                });
+            });
+
+
+            document.addEventListener("deviceready", onDeviceReady, false);
+
+            function onDeviceReady() {
+
+            }
+
+            function log(msg) {
+                $('#log').append("<br/>" + getTime() + " - " + msg);
+
+            }
+
+            function getTime() {
+                var currentTime = new Date();
+                var hours = currentTime.getHours();
+                var minutes = currentTime.getMinutes();
+                var seconds = currentTime.getSeconds();
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+                if (seconds < 10) {
+                    seconds = "0" + seconds;
+                }
+                var time = hours + ":" + minutes + ":" + seconds + " ";
+                if(hours > 11){
+                    time +=" PM";
+                } else {
+                    time += " AM";
+                }
+                return time;
+            }
+
+
+
+            //*********** ALARM ******************************************************************
+            function turnAlarmOn() {
+                log("geolocation.getCurrentPosition...");
+                navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+                log("geolocation.getCurrentPosition complete.");
+                // Options: throw an error if no update is received every 30 seconds.
+                //
+                //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
+
+            }
+            //*********** END - ALARM ******************************************************************
+
+            //********** GPS STUFF *****************************************************************
+            // onSuccess Geolocation
+            //
+            function onGeoSuccess(position) {
+                var element = document.getElementById('geolocation');
+                element.innerHTML = 'Latitude: ' + position.coords.latitude            + '<br />' +
+                        'Longitude: '          + position.coords.longitude             + '<br />' +
+                        'Altitude: '           + position.coords.altitude              + '<br />' +
+                        'Accuracy: '           + position.coords.accuracy              + '<br />' +
+                        'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+                        'Heading: '            + position.coords.heading               + '<br />' +
+                        'Speed: '              + position.coords.speed                 + '<br />' +
+                        'Timestamp: '          + position.timestamp                    + '<br />';
+
+            }
+
+            // onError Callback receives a PositionError object
+            //
+            function onGeoError(error) {
+                alert('code: '    + error.code    + '\n' +
+                        'message: ' + error.message + '\n');
+            }
+
+
+            // onSuccess Callback
+            //   This method accepts a `Position` object, which contains
+            //   the current GPS coordinates
+            //
+            function onWatchSuccess(position) {
+                var element = document.getElementById('geolocation');
+                element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
+                        'Longitude: ' + position.coords.longitude     + '<br />' +
+                        '<hr />'      + element.innerHTML;
+            }
+
+            // onError Callback receives a PositionError object
+            //
+            function onWatchError(error) {
+                alert('code: '    + error.code    + '\n' +
+                        'message: ' + error.message + '\n');
+            }
+            //********** END - GPS STUFF *****************************************************************
+
+            //****** START - ALARM STUFF *******************
+            //alert
+            function alarm() {
+                log("ALARM!!");
+                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "Wakey", "Okie Dokie");
+                if (alarmType == 1 || alarmType == 3) {
+                    navigator.notification.beep(5);
+                }
+                if (alarmType == 2 || alarmType == 3) {
+                    navigator.notification.vibrate(2000);
+                }
+            }
+
+            function alarmCallback() {
+                //cancel alarm?
+            }
+            //****** END - ALARM STUFF *******************
+
+
+
+
+
+        </script>
 	</head>
 	<body>
         <section id="page1" data-role="page" data-fullscreen="true">
@@ -65,22 +202,39 @@
                 <div id="timeRemaining" style="border: solid #828282; border-radius: 15px; overflow: hidden;text-align: center">
                     Projected Arrival Time
                     <br />
-                    <span style="font-size: 32px;">4:34</span>
+                    <span style="font-size: 32px;">??:??</span>
                 </div>
 
                 <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
 
-                <!--<a href="#page2">Page 2</a>-->
+                <div style="background-color: #111111; font-size: 12px; color: #C6E746;" data-role="collapsible">
+                    <h3>Debug Log</h3>
+                    <a href="#pageDebug">debug</a>
+                    <div id="log"></div>
+                </div>
             </div>
             <footer data-role="footer"><h1>MTS</h1></footer>
         </section>
 
         <section id="pageMap" data-role="page">
-            <header data-role="header"><h1>BNA 2</h1></header>
+            <header data-role="header"><h1>BART Map</h1></header>
             <div class="content" data-role="content">
                 <p><img src="assets/img/system-map.gif"></p>
             </div>
             <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
         </section>
+
+        <section id="pageDebug" data-role="page">
+            <header data-role="header"><h1>Debug Page</h1></header>
+            <div class="content" data-role="content">
+                <div id="geolocation">
+
+                </div>
+                <a href="#" id="" onclick="alarm()">Alarm</a>
+            </div>
+            <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
+        </section>
+
+
 	</body>
 </html>
