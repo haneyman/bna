@@ -26,8 +26,7 @@
                 $("[name=radio-alarm-state]").change(function() {
                     isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
                     log("Alarm switched to " + isAlarmOn);
-                    if (isAlarmOn)
-                        turnAlarmOn();
+                    switchAlarm(isAlarmOn);
                 });
 
                 $("[name=radio-alarmtype]").change(function() {
@@ -39,6 +38,8 @@
                         alarmType = 3;
                     log("Alarm type is now " + alarmType);
                 });
+
+                switchAlarm(false);
             });
 
 
@@ -76,10 +77,15 @@
 
 
             //*********** ALARM ******************************************************************
-            function turnAlarmOn() {
-                log("geolocation.getCurrentPosition...");
-                navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
-                log("geolocation.getCurrentPosition complete.");
+            function switchAlarm(isAlarmOn) {
+                if (isAlarmOn) {
+                    log("calling geolocation.getCurrentPosition...");
+                    navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+                    log("geolocation.getCurrentPosition complete.");
+                    $('#timeRemaining').show();
+                } else {
+                    $('#timeRemaining').hide();
+                }
                 // Options: throw an error if no update is received every 30 seconds.
                 //
                 //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
@@ -184,7 +190,7 @@
                     <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
                     <label for="radio-alarmtype-vibrate">Vibrate</label>
                     <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
-                    <label for="radio-alarmtype-both">Alarm and Vibrate</label>
+                    <label for="radio-alarmtype-both">Alarm/Vibrate</label>
                 </fieldset>
 
 
