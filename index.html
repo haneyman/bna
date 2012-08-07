@@ -9,6 +9,7 @@
 		<script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
 		<script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
 		<!--<script src="assets/js/xui.js" type="text/javascript" charset="utf-8"></script>-->
 		<!--<script src="assets/js/lawnchair/adaptors/LawnchairAdaptorHelpers.js" type="text/javascript" charset="utf-8"></script>-->
 		<!--<script src="assets/js/lawnchair/adaptors/DOMStorageAdaptor.js" type="text/javascript" charset="utf-8"></script>-->
@@ -24,6 +25,7 @@
             var url = "";
             var bartApiResult;
             var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
+            var arrayStopTimes = [];
 
             $(document).ready(function(){
                 $("[name=radio-alarm-state]").change(function() {
@@ -76,6 +78,51 @@
                 return time;
             }
 
+            //*********** CSV ***************************************************************
+            //currently located local in /gtfs
+            function loadStopTimes() {
+                //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
+                var csvfile = "gtfs/stop_times.txt";
+                log("loading gtfs stoptimes...");
+                //jQuery.get(csvfile, function(data) {
+                //    arrayStopTimes = jQuery.csv()(data); });
+                $.ajax({
+                    url : csvfile,
+                    dataType : "text",
+                    success : function (data) {
+                        arrayStopTimes = jQuery.csv()(data);
+                        //arrayStopTimes = $.csv2Array(csvString);
+                        //alert(data);
+                    }
+                });
+
+                log("gtfs stoptimes loaded.");
+            }
+
+            function findTrip(orig, dest) {
+                //iterate through
+                var inRoute = false;
+                var stopTime = [];
+                var origTime = "";
+                var destTime = "";
+                for (i=0; i < arrayStopTimes.length; i++) {
+                    stopTime = arrayStopTimes[i];
+                    if (stopTime[3] == orig) {
+                        inRoute = true;
+                        origTime = stopTime[1];
+                    }
+                    if (inRoute) {
+                        if (stopTime[3] == dest) {
+                            destTime = stopTime[1];
+                            break;
+                        }
+                    }
+                }
+                alert("found: " + origTime + " " + destTime);
+            }
+
+
+
             //*********** BART API ***************************************************************
             function callBartApi(url) {
                 log("callBartApi starting... " + url)
@@ -111,7 +158,7 @@
                     $(this).find('name').each(function(){
                         name = $(this).text();
                     });
-                    $(this).find('name').each(function(){
+                    $(this).find('abbr').each(function(){
                         abbr = $(this).text();
                     });
                     //save to cache??????
@@ -321,8 +368,10 @@
 
                 <div style="background-color: #111111; font-size: 12px; color: #C6E746;" data-role="collapsible">
                     <h3>Debug Log</h3>
-                    <a href="#pageDebug">debug</a>
-                    <a href="#" onclick="getBartStations();">Load Stations</a>
+                    <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
+                    <a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;
+                    <a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;
+                    <a href="#" onclick="findTrip('CONC','MONT');">Time for Conc-Mont</a>&nbsp;&nbsp;&nbsp;
                     <div id="log"></div>
                 </div>
             </div>
