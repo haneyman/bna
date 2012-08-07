@@ -20,8 +20,9 @@
         <script type="text/javascript">
             var isAlarmOn = false; //off, on, ??
             var alarmType = 0; //0=none, 1=alarm, 2=vibrate, 3=both
-            var stationDepart = "";
-            var stationArrive = "";
+            var stationDepartAbbr = "";
+            var stationArriveAbbr = "";
+            var tripTime;
             var url = "";
             var bartApiResult;
             var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
@@ -53,6 +54,17 @@
             function onDeviceReady() {
 
             }
+
+            function getTimeRemaining() {
+                //stationDepart = $("#select-depart option:selected").text();
+                stationDepartAbbr = $("#select-depart option:selected").val();
+                stationArriveAbbr = $("#select-arrive option:selected").val();
+                log("Stations are from " + stationDepartAbbr + " to " + stationArriveAbbr);
+
+            }
+
+
+            //**************** utilities **************************************************
 
             function log(msg) {
                 $('#log').append("<br/>" + getTime() + " - " + msg);
@@ -118,8 +130,20 @@
                         }
                     }
                 }
-                alert("found: " + origTime + " " + destTime);
+                log("found trip- orig:" + origTime + " dest:" + destTime);
+                return (timeDiff(origTime, destTime))
+
             }
+
+            function timeDiff(time1, time2) {
+                var time1ss = HMStoSec1(time1);
+                var time2ss = HMStoSec1(time2);
+                var diff = time2ss - time1ss;
+                return convertSecondsToHHMMSS(diff);
+            }
+
+            function HMStoSec1(T) { // h:m:s
+                var A = T.split(/\D+/) ; return (A[0]*60 + +A[1])*60 + +A[2] }
 
 
 
