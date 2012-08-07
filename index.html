@@ -138,8 +138,9 @@
             function timeDiff(time1, time2) {
                 var time1ss = HMStoSec1(time1);
                 var time2ss = HMStoSec1(time2);
-                var diff = time2ss - time1ss;
-                return convertSecondsToHHMMSS(diff);
+                var diffmm = (time2ss - time1ss) / 60;
+                log("Time diff = " + diffmm + " minutes");
+                return convertSecondsToHHMMSS(diffmm);
             }
 
             function HMStoSec1(T) { // h:m:s
