@@ -27,6 +27,7 @@
             var bartApiResult;
             var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
             var arrayStopTimes = [];
+            var arrayStations  = [];
 
             $(document).ready(function(){
                 $("[name=radio-alarm-state]").change(function() {
@@ -45,13 +46,28 @@
                     log("Alarm type is now" + alarmType);
                 });
 
+                $('#select-depart').change(function() {
+                    newTrip();
+                });
+                $('#select-arrive').change(function() {
+                    newTrip();
+                });
+
+                //initializations
+                $('#debugLog').trigger( "expand" );
                 switchAlarm(false);
+                loadStations();
             });
 
 
             document.addEventListener("deviceready", onDeviceReady, false);
 
             function onDeviceReady() {
+
+            }
+
+            function newTrip() {
+                alert("newtrip2")
 
             }
 
@@ -111,6 +127,37 @@
                 log("gtfs stoptimes loaded.");
             }
 
+            function loadStations() {
+                var abbr = "?";
+                var name = "?";
+                var options = "";
+                var csvfile = "gtfs/stops.txt";
+                log("loading gtfs stations...");
+                $.ajax({
+                    url : csvfile,
+                    dataType : "text",
+                    async : false,
+                    success : function (data) {
+                        arrayStations = jQuery.csv()(data);
+                        alert("length:" + arrayStations.length);
+                    }
+                });
+
+                for (i=0; i < arrayStations.length; i++) {
+                    station = arrayStations[i];
+                    abbr = station[0];
+                    name = station[1];
+                    options += '<option value="' + abbr + '">' + name + '</option>';
+                }
+                log("gtfs stations loaded.");
+
+                $('#select-depart').html(options);
+                $('#select-arrive').html(options);
+            }
+
+
+
+
             function findTrip(orig, dest) {
                 //iterate through
                 var inRoute = false;
@@ -149,6 +196,7 @@
 
 
             //*********** BART API ***************************************************************
+/*
             function callBartApi(url) {
                 log("callBartApi starting... " + url)
                 var result = null;
@@ -168,7 +216,7 @@
             };
 
             //    <name>12th St. Oakland City Center</name><abbr>12TH</abbr><gtfs_latitude>37.803664</gtfs_latitude><gtfs_longitude>-122.271604</gtfs_longitude><address>1245 Broadway</address><city>Oakland</city><county>alameda</county><state>CA</state><zipcode>94612</zipcode>
-            function getBartStations() {
+            function getBartStationsApi() {
                 //http://api.bart.gov/docs/overview/index.aspx
                 //http://www.bart.gov/schedules/developers/index.aspx
                 //key UBHV-T2TG-U2UQ-2VA5
@@ -255,6 +303,7 @@
                     });
                 });
             }
+ */
 
 
             //*********** ALARM ******************************************************************
@@ -391,7 +440,7 @@
 
                 <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
 
-                <div style="background-color: #111111; font-size: 12px; color: #C6E746;" data-role="collapsible">
+                <div id="debugLog" style="background-color: #111111; font-size: 12px; color: #C6E746;" data-role="collapsible">
                     <h3>Debug Log</h3>
                     <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
                     <a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;
