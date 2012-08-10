@@ -231,13 +231,13 @@
             //the actual sound and/or vibrate alarm, called via alarmInterval via alarm()
             function alarmAlert() {
                 log("alarmAlert()");
-                window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
                 if (alarmType == 1 || alarmType == 3) {
                     navigator.notification.beep(5);
                 }
                 if (alarmType == 2 || alarmType == 3) {
                     navigator.notification.vibrate(2000);
                 }
+                window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
             }
 
             //check if ok to turn alarm on
