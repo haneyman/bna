@@ -215,6 +215,44 @@
 
 
             //****** START - ALARM STUFF *******************
+            //check if ok to turn alarm on
+            function alarmable() {
+                if (stationDepartAbbr == "") {
+                    alert("You need an Departing Station");
+                    alarmOff();
+                    return false;
+                }
+                if (stationArriveAbbr == "") {
+                    alert("You need an Arriving Station");
+                    alarmOff();
+                    return false;
+                }
+
+                return true;
+            }
+
+            //handler to turn on alarm
+            function alarmOn() {
+                if (alarmable()) {
+                    log("alarm ON");
+                    $('#alarmStatus').show();
+                    departTime = new Date();//TODO: Setting departTime to current time for now
+                    arriveTime = new Date();
+                    arriveTime.setTime(departTime.getTime() + (tripTime * 1000));//tripTime is in seconds
+                    log("  departTime = " + formatTime(departTime) + "  arrive:" + formatTime(arriveTime));
+                    timeout=setTimeout(function(){updateAlarmDisplay()},1000);
+                }
+            }
+
+            //handler to turn OFF alarm
+            function alarmOff() {
+                clearTimeout(timeout);
+                $('#alarmStatus').hide();
+                $('#radio-alarm-on').removeAttr('checked').checkboxradio("refresh");
+                $('#radio-alarm-off').attr('checked',true).checkboxradio("refresh");
+                log("alarmOff()");
+            }
+
             //alert sound the alarm
             function alarm() {
                 log("ALARM!!");
@@ -240,22 +278,6 @@
                 window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
             }
 
-            //check if ok to turn alarm on
-            function alarmable() {
-                if (stationDepartAbbr == "") {
-                    alert("You need an Departing Station");
-                    alarmOff();
-                    return false;
-                }
-                if (stationArriveAbbr == "") {
-                    alert("You need an Arriving Station");
-                    alarmOff();
-                    return false;
-                }
-
-                return true;
-            }
-
             function getGeo() {
                 //log("calling geolocation.getCurrentPosition...");
                 //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
@@ -264,18 +286,6 @@
                 // Options: throw an error if no update is received every 30 seconds.
                 //
                 //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
-            }
-
-            function alarmOn() {
-                if (alarmable()) {
-                    log("alarm ON");
-                    $('#alarmStatus').show();
-                    departTime = new Date();//TODO: Setting departTime to current time for now
-                    arriveTime = new Date();
-                    arriveTime.setTime(departTime.getTime() + (tripTime * 1000));//tripTime is in seconds
-                    log("  departTime = " + formatTime(departTime) + "  arrive:" + formatTime(arriveTime));
-                    timeout=setTimeout(function(){updateAlarmDisplay()},1000);
-                }
             }
 
             //called via setTimout every second
@@ -296,15 +306,6 @@
                     timeout=setTimeout(function(){updateAlarmDisplay()},5000);
                 }
             }
-
-            function alarmOff() {
-                clearTimeout(timeout);
-                $('#alarmStatus').hide();
-                $('#radio-alarm-on').removeAttr('checked').checkboxradio("refresh");
-                $('#radio-alarm-off').attr('checked',true).checkboxradio("refresh");
-                log("alarmOff()");
-            }
-
             //formats a date into hh:mm:ss
             function formatTime(date) {
                 var h=date.getHours();
