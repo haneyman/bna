@@ -32,6 +32,7 @@
             var arrayStopTimes = [];
             var arrayStations  = [];
             var timeout;//holds setTimeout
+            var alarmInterval;//stores interval for sounding alarm
 
             $(document).ready(function(){
 //                $( "#progressbar" ).progressbar({
@@ -214,10 +215,23 @@
 
 
             //****** START - ALARM STUFF *******************
-            //alert
+            //alert sound the alarm
             function alarm() {
                 log("ALARM!!");
-                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "Wakey", "Okie Dokie");
+                alarmOff();
+                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
+                alarmInterval=setInterval(function(){alarmAlert()},3000);
+            }
+
+            //called when they acknowlege alarm dialog
+            function alarmCallback() {
+                alarmInterval.cancel();
+            }
+
+            //the actual sound and/or vibrate alarm, called via alarmInterval via alarm()
+            function alarmAlert() {
+                log("alarmAlert()");
+                window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
                 if (alarmType == 1 || alarmType == 3) {
                     navigator.notification.beep(5);
                 }
@@ -271,7 +285,7 @@
                 var diff = (arriveTime.getTime() - new Date().getTime()) ;
 
                 $('#timeRemaining').html(formatMilliseconds(diff));
-                $('#progressbar').val(diff / tripTime);
+                //$('#progressbar').val(diff / tripTime);
                 if (diff < MINUTES_BEFORE_ARRIVAL * 1000 * 60) {
                     //if (diff < 0)
                     //    $('#timeRemaining').html("ARRIVED");
@@ -325,9 +339,6 @@
                 return i;
             }
 
-            function alarmCallback() {
-                //cancel alarm?
-            }
             //****** END - ALARM STUFF *******************
 
 
@@ -551,7 +562,7 @@
                     <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
                 </div>
             </div>
-            <footer data-role="footer"><h1>MTS</h1></footer>
+            <footer data-role="footer"><h1>MTS</h1>Build 2</footer>
         </section>
 
         <section id="pageMap" data-role="page">
