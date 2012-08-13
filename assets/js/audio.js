@@ -58,7 +58,7 @@ function stopAudio() {
         my_media.stop();
     }
     clearInterval(mediaTimer);
-    mediaTimer = null;
+mediaTimer = null;
 }
 
 // onSuccess Callback

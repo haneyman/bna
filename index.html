@@ -95,6 +95,7 @@
             //**************** utilities **************************************************
 
             function log(msg) {
+
                 $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
             }
 
@@ -344,9 +345,12 @@
             //****** END - ALARM STUFF *******************
 
         function playAlarmFile() {
-            ALARM1 = "assets/audio/hangout_dingtone.m4a";
-            log(ALARM1)
-            playAudio(ALARM1);
+//            ALARM1 = "assets/audio/hangout_dingtone.m4a";
+            var ALARM1 = "hangout_dingtone.m4a";
+            log(ALARM1) ;
+            new Media(ALARM1).play();
+            log("alarm complete");
+            //playAudio(ALARM1);
         }
 
 
@@ -555,7 +559,7 @@
                     <span id="timeRemaining" style="font-size: 32px;">??:??</span>
                     <div id="progressbar"></div>
                 </div>
-
+                <audio src="SilversunPickupsLazyEye.mp3" controls preload="auto" autobuffer></audio>
                 <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
 
                 <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
