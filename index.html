@@ -20,6 +20,7 @@
 		<!--<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>-->
         <script type="text/javascript">
             var MINUTES_BEFORE_ARRIVAL = 5;
+            var ALARM_SOUND_FILE_1 = 'assets/audio/alarmBig.mp3';
             var isAlarmOn = false; //off, on, ??
             var alarmType = 0; //0=none, 1=alarm, 2=vibrate, 3=both
             var stationDepartAbbr = "";
@@ -92,6 +93,15 @@
                 tripTime = findTripTime(stationDepartAbbr, stationArriveAbbr);
                 log("Stations changed - newTrip is from " + stationDepartAbbr + " to " + stationArriveAbbr + "  Time=" + tripTime/60 + " minutes");
             }
+
+            function getDepartingTrains() {
+                $('#departingTrains').append("<li>" + "8 Car train arriving in 7 minutes." + "</li>");
+                $('#departingTrains').append("<li>" + "9 Car train arriving in 12 minutes." + "</li>");
+                $('#departingTrains').append("<li>" + "10 Car train arriving in 22 minutes." + "</li>");
+                $('#departingTrains').append("<li>" + "TEST DATA!!!" + "</li>");
+                $('#departingTrains').listview('refresh');
+            }
+
 
 
             //*********** CSV - GTFS ***************************************************************
@@ -213,25 +223,27 @@
             function alarm() {
                 log("ALARM!!");
                 alarmOff();
-                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
-                alarmInterval=setInterval(function(){alarmAlert()},3000);
-            }
-
-            //called when they acknowlege alarm dialog
-            function alarmCallback() {
-                alarmInterval.cancel();
-            }
-
-            //the actual sound and/or vibrate alarm, called via alarmInterval via alarm()
-            function alarmAlert() {
-                log("alarmAlert()");
                 if (alarmType == 1 || alarmType == 3) {
-                    navigator.notification.beep(5);
+                    //navigator.notification.beep(5);
+                    playSound(ALARM_SOUND_FILE_1);
                 }
                 if (alarmType == 2 || alarmType == 3) {
                     navigator.notification.vibrate(2000);
                 }
-                window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
+
+                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
+                //window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
+                //alarmInterval=setInterval(function(){alarmAlert()},3000);
+            }
+
+            //called when they acknowlege alarm dialog
+            function alarmCallback() {
+                media.stop();
+                //alarmInterval.cancel();
+            }
+
+            //the actual sound and/or vibrate alarm, called via alarmInterval via alarm()
+            function alarmAlert() {
             }
 
             function getGeo() {
@@ -263,47 +275,34 @@
                 }
             }
 
+
+            function playSound(soundFile) {
+                if (device.platform == 'Android') {
+                    soundFile = '/android_asset/www/' + soundFile;///android_asset/www
+                }
+                log("playSound() of: " + soundFile) ;
+    //            if(media != null)
+    //            {
+    //                media.release();
+    //                media = null;
+    //            }
+                media = new Media(soundFile, onMediaSuccess, onMediaError);
+                //media.seekTo(0);
+                media.play();
+                log("playSound() complete.");
+                //alert("Do it work?");
+                //playAudio(ALARM1);
+            }
+
+            function onMediaSuccess() {
+                alert("onMediaSuccess()");
+            }
+
+            function onMediaError(e) {
+                alert("onMediaError(): " + e.message);
+            }
+
             //****** END - ALARM STUFF *******************
-
-        function playAlarmFile() {
-            playSound("/assets/audio/alarmBig.mp3");///sdcard/android_asset/www/assets/audio/
-            playSound("assets/audio/alarmBig.mp3"); ///sdcard/alarmSmall.mp3
-            playSound("/android_asset/www/assets/audio/alarmBig.mp3");
-            playSound("android_asset/www/assets/audio/alarmBig.mp3");
-            playSound("android_asset/www/alarmSmall.mp3");
-            playSound("alarmSmall.mp3");
-        }
-
-        function playSound(soundFile) {
-//            ALARM1 = "assets/audio/hangout_dingtone.m4a";
-            //var ALARM1 = "/android_asset//audio/alarmBig.mp3";
-            //if (device.platform == 'Android') {
-                //src = '/android_asset/www/' + src;
-            //}
-            log("playSound() of: " + soundFile) ;
-
-//            if(media != null)
-//            {
-//                media.release();
-//                media = null;
-//            }
-
-            media = new Media(soundFile, onMediaSuccess, onMediaError);
-            //media.seekTo(0);
-            media.play();
-            log("alarm complete");
-            alert("Do it work?");
-            //playAudio(ALARM1);
-        }
-
-        function onMediaSuccess() {
-
-        }
-
-        function onMediaError(e) {
-            alert("onMediaError(): " + e.message);
-        }
-
 
             //*********** BART API ***************************************************************
 /*
@@ -462,6 +461,7 @@
             function log(msg) {
 
                 $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+                console.log(msg);
             }
 
             function getCurrentTime() {
@@ -572,7 +572,7 @@
                     <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
                     <label for="radio-alarmtype-vibrate">Vibrate</label>
                     <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
-                    <label for="radio-alarmtype-both">A/V</label>
+                    <label for="radio-alarmtype-both">Both</label>
                 </fieldset>
 
 
@@ -596,6 +596,14 @@
                 <!--<audio src="SilversunPickupsLazyEye.mp3" controls preload="auto" autobuffer></audio>-->
                 <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
 
+                <div id="departingTrainsDiv" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
+                    <h3>Departing Trains</h3>
+                    <button value="" style="" onclick="getDepartingTrains()">Refresh</button>
+                    <br/>
+                    <!--<div id="departingTrains"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>-->
+                    <ul id="departingTrains"   data-role="listview" data-theme="c"></ul>
+                </div>
+
                 <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
                     <h3>Debug Log</h3>
                     <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
@@ -603,12 +611,7 @@
                     <!--<a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;-->
                     <!--<a href="#" onclick="findTripTime(stationDepartAbbr,stationArriveAbbr);">Trip Time</a>&nbsp;&nbsp;&nbsp;-->
                     <!--<a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;-->
-                    <a href="#" onclick="playSound('/assets/audio/alarmBig.mp3');">Alarm1</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="playSound('assets/audio/alarmBig.mp3');">Alarm2</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="playSound('/android_asset/www/assets/audio/alarmBig.mp3');">Alarm3</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="playSound('android_asset/www/assets/audio/alarmBig.mp3');">Alarm4</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="playSound('android_asset/www/alarmSmall.mp3');">Alarm5</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="playSound('alarmSmall.mp3');">Alarm5</a>&nbsp;&nbsp;&nbsp;
+                    <a href="#" onclick="alarm()">Alarm</a>&nbsp;&nbsp;&nbsp;
                     <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
                 </div>
             </div>
