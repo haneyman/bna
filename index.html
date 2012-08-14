@@ -288,7 +288,7 @@
 //                media = null;
 //            }
 
-            media = new Media(ALARM1, onMediaSuccess, onMediaError);
+            media = new Media(soundFile, onMediaSuccess, onMediaError);
             //media.seekTo(0);
             media.play();
             log("alarm complete");
