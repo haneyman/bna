@@ -34,6 +34,7 @@
             var arrayStations  = [];
             var timeout;//holds setTimeout
             var alarmInterval;//stores interval for sounding alarm
+            var media;
 
             $(document).ready(function(){
 //                $( "#progressbar" ).progressbar({
@@ -92,54 +93,7 @@
                 log("Stations changed - newTrip is from " + stationDepartAbbr + " to " + stationArriveAbbr + "  Time=" + tripTime/60 + " minutes");
             }
 
-            //**************** utilities **************************************************
 
-            function log(msg) {
-
-                $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
-            }
-
-            function getCurrentTime() {
-                var currentTime = new Date();
-                var hours = currentTime.getHours();
-                var minutes = currentTime.getMinutes();
-                var seconds = currentTime.getSeconds();
-                if (minutes < 10) {
-                    minutes = "0" + minutes;
-                }
-                if (seconds < 10) {
-                    seconds = "0" + seconds;
-                }
-                var time = hours + ":" + minutes + ":" + seconds + " ";
-                if(hours > 11){
-                    time +=" PM";
-                } else {
-                    time += " AM";
-                }
-                return time;
-            }
-
-            //times are assumed in hh:mm:ss format
-            //returns in seconds
-            function timeDiff(time1, time2) {
-                var time1ss = HMStoSec1(time1);
-                var time2ss = HMStoSec1(time2);
-                var diffss = (time2ss - time1ss);
-                var diffmm =  diffss / 60;
-                log("Time diff = " + diffmm + " minutes");
-                return diffss;
-            }
-
-            //takes in hh:mm:ss and returns seconds
-            function HMStoSec1(T) { // h:m:s
-                var A = T.split(/\D+/) ;
-                return (A[0]*60 + +A[1])*60 + +A[2];
-            }
-
-            //adds specified number of seconds to the time hh:mm:ss
-            function addToTime(time, addSeconds) {
-
-            }
             //*********** CSV - GTFS ***************************************************************
             //currently data is located local in /gtfs
             //
@@ -308,49 +262,33 @@
                     timeout=setTimeout(function(){updateAlarmDisplay()},5000);
                 }
             }
-            //formats a date into hh:mm:ss
-            function formatTime(date) {
-                var h=date.getHours();
-                var m=date.getMinutes();
-                var s=date.getSeconds();
-                // add a zero in front of numbers<10
-                m=padTime(m);
-                s=padTime(s);
-                return h + ":" + m + ":" + s;
-            }
-
-            function formatMilliseconds(ms) {
-                var x = ms / 1000;
-                var seconds = x % 60;
-                x /= 60;
-                minutes = x % 60;
-                minutes = Math.floor(minutes);
-                x /= 60;
-                hours = x % 24;
-                hours = Math.floor(hours);
-                x /= 2;
-                var result = "";
-                if (hours > 0)
-                    result = hours + " hrs ";
-                result += minutes + " min ";
-                return result;
-            }
-
-            function padTime(i) {
-                if (i<10)
-                    i="0" + i;
-                return i;
-            }
 
             //****** END - ALARM STUFF *******************
 
         function playAlarmFile() {
 //            ALARM1 = "assets/audio/hangout_dingtone.m4a";
-            var ALARM1 = "SilversunPickupsLazyEye.mp3";
-            log(ALARM1) ;
-            new Media(ALARM1).play();
+            var ALARM1 = "alarmBig.mp3";
+            log("playAlarmFile() of: " + ALARM1) ;
+
+            if(media != null)
+            {
+                media.release();
+                media = null;
+            }
+
+            media = new Media(ALARM1, onMediaSuccess, onMediaError);
+            media.seekTo(0);
+            media.play();
             log("alarm complete");
             //playAudio(ALARM1);
+        }
+
+        function onMediaSuccess() {
+
+        }
+
+        function onMediaError() {
+            alert("onMediaError()");
         }
 
 
@@ -506,6 +444,89 @@
             }
             //********** END - GPS STUFF *****************************************************************
 
+            //**************** utilities **************************************************
+
+            function log(msg) {
+
+                $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+            }
+
+            function getCurrentTime() {
+                var currentTime = new Date();
+                var hours = currentTime.getHours();
+                var minutes = currentTime.getMinutes();
+                var seconds = currentTime.getSeconds();
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+                if (seconds < 10) {
+                    seconds = "0" + seconds;
+                }
+                var time = hours + ":" + minutes + ":" + seconds + " ";
+                if(hours > 11){
+                    time +=" PM";
+                } else {
+                    time += " AM";
+                }
+                return time;
+            }
+
+            //times are assumed in hh:mm:ss format
+            //returns in seconds
+            function timeDiff(time1, time2) {
+                var time1ss = HMStoSec1(time1);
+                var time2ss = HMStoSec1(time2);
+                var diffss = (time2ss - time1ss);
+                var diffmm =  diffss / 60;
+                log("Time diff = " + diffmm + " minutes");
+                return diffss;
+            }
+
+            //takes in hh:mm:ss and returns seconds
+            function HMStoSec1(T) { // h:m:s
+                var A = T.split(/\D+/) ;
+                return (A[0]*60 + +A[1])*60 + +A[2];
+            }
+
+            //adds specified number of seconds to the time hh:mm:ss
+            function addToTime(time, addSeconds) {
+
+            }
+
+
+            //formats a date into hh:mm:ss
+            function formatTime(date) {
+                var h=date.getHours();
+                var m=date.getMinutes();
+                var s=date.getSeconds();
+                // add a zero in front of numbers<10
+                m=padTime(m);
+                s=padTime(s);
+                return h + ":" + m + ":" + s;
+            }
+
+            function formatMilliseconds(ms) {
+                var x = ms / 1000;
+                var seconds = x % 60;
+                x /= 60;
+                minutes = x % 60;
+                minutes = Math.floor(minutes);
+                x /= 60;
+                hours = x % 24;
+                hours = Math.floor(hours);
+                x /= 2;
+                var result = "";
+                if (hours > 0)
+                    result = hours + " hrs ";
+                result += minutes + " min ";
+                return result;
+            }
+
+            function padTime(i) {
+                if (i<10)
+                    i="0" + i;
+                return i;
+            }
 
 
 
