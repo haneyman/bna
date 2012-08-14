@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\Git\bin\git" push origin master
+c:\android-sdk\platform-tools\adb  install "c:\downloads\BNAApplication-Build.apk"
