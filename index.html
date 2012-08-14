@@ -266,13 +266,21 @@
             //****** END - ALARM STUFF *******************
 
         function playAlarmFile() {
+            playSound("/assets/audio/alarmBig.mp3");
+            playSound("assets/audio/alarmBig.mp3");
+            playSound("/android_asset/www/assets/audio/alarmBig.mp3");
+            playSound("android_asset/www/assets/audio/alarmBig.mp3");
+            playSound("android_asset/www/alarmSmall.mp3");
+            playSound("alarmSmall.mp3");
+        }
+
+        function playSound(soundFile) {
 //            ALARM1 = "assets/audio/hangout_dingtone.m4a";
             //var ALARM1 = "/android_asset//audio/alarmBig.mp3";
             //if (device.platform == 'Android') {
                 //src = '/android_asset/www/' + src;
             //}
-            var ALARM1 = "/assets/www/assets/audio/alarmBig.mp3";
-            log("playAlarmFile() of: " + ALARM1) ;
+            log("playSound() of: " + soundFile) ;
 
 //            if(media != null)
 //            {
