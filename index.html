@@ -22,7 +22,7 @@
             var MINUTES_BEFORE_ARRIVAL = 5;
             var ALARM_SOUND_FILE_1 = 'assets/audio/alarmBig.mp3';
             var isAlarmOn = false; //off, on, ??
-            var alarmType = 0; //0=none, 1=alarm, 2=vibrate, 3=both
+            var alarmType = 3; //0=none, 1=alarm, 2=vibrate, 3=both
             var stationDepartAbbr = "";
             var stationArriveAbbr = "";
             var tripTime;//in seconds
@@ -70,12 +70,18 @@
 
                 //initializations
                 $('#debugLog').trigger( "expand" );
-                //switchAlarm(false);
+                //load gtfs schedule data
                 loadStations();
                 loadStopTimes();
+                //initialize trip to -- last used???
                 $("#select-depart option:selected").val("");//TODO:not working, says "North Concord"
                 $("#select-arrive option:selected").val("");
+                //initialize alarm off
                 alarmOff();
+                //initialize type to both
+                $('#radio-alarmtype-noise').removeAttr('checked').checkboxradio("refresh");
+                $('#radio-alarmtype-vibrate').removeAttr('checked').checkboxradio("refresh");
+                $('radio-alarmtype-both').attr('checked',true).checkboxradio("refresh");
             });
 
 
@@ -219,10 +225,9 @@
                 log("alarmOff()");
             }
 
-            //alert sound the alarm
+            //alert sound/vibrate the alarm
             function alarm() {
-                log("ALARM!!");
-                alarmOff();
+                log("ALARM!! Type is " + alarmType);
                 if (alarmType == 1 || alarmType == 3) {
                     //navigator.notification.beep(5);
                     playSound(ALARM_SOUND_FILE_1);
@@ -239,6 +244,7 @@
             //called when they acknowlege alarm dialog
             function alarmCallback() {
                 media.stop();
+                alarmOff();
                 //alarmInterval.cancel();
             }
 

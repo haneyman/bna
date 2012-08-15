@@ -4,7 +4,7 @@
 	id		= "com.phonegap.getting.started"
 	version 	= "1.0.0">
 
-	<name>BNA Application</name>
+	<name>BNA</name>
 
 	<description>
 		My BNA application from git at https://github.com/haneyman/bna.git
