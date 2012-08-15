@@ -236,13 +236,14 @@
                     navigator.notification.vibrate(2000);
                 }
 
-                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
+                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback, "BNA Alarm", "OK I'm awake");
                 //window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
                 //alarmInterval=setInterval(function(){alarmAlert()},3000);
             }
 
             //called when they acknowlege alarm dialog
             function alarmCallback() {
+                log("alarmCallback()");
                 media.stop();
                 alarmOff();
                 media.release();
@@ -463,7 +464,7 @@
 
             function log(msg) {
 
-                $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+                $('#log').append("<br/>********** " + getCurrentTime() + " - " + msg);
                 console.log(msg);
             }
 
