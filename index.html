@@ -236,7 +236,7 @@
                     navigator.notification.vibrate(2000);
                 }
 
-                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
+               //navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "BNA Alarm", "OK I'm awake");
                 //window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
                 //alarmInterval=setInterval(function(){alarmAlert()},3000);
             }
@@ -245,11 +245,8 @@
             function alarmCallback() {
                 media.stop();
                 alarmOff();
+                media.release();
                 //alarmInterval.cancel();
-            }
-
-            //the actual sound and/or vibrate alarm, called via alarmInterval via alarm()
-            function alarmAlert() {
             }
 
             function getGeo() {
@@ -294,18 +291,18 @@
     //            }
                 media = new Media(soundFile, onMediaSuccess, onMediaError);
                 //media.seekTo(0);
-                media.play();
-                log("playSound() complete.");
+                media.play({ numberOfLoops: 1, playAudioWhenScreenIsLocked : true });
+                //log("playSound() complete.");
                 //alert("Do it work?");
                 //playAudio(ALARM1);
             }
 
             function onMediaSuccess() {
-                alert("onMediaSuccess()");
+                log("onMediaSuccess()");
             }
 
             function onMediaError(e) {
-                alert("onMediaError(): " + e.message);
+                log("onMediaError(): msg = " + e.message + " code: " + e.code);
             }
 
             //****** END - ALARM STUFF *******************
@@ -613,10 +610,7 @@
                 <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
                     <h3>Debug Log</h3>
                     <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
-                    <!--<a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;-->
-                    <!--<a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;-->
-                    <!--<a href="#" onclick="findTripTime(stationDepartAbbr,stationArriveAbbr);">Trip Time</a>&nbsp;&nbsp;&nbsp;-->
-                    <!--<a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;-->
+                    <a href="#" onclick="$('log').html('');">Clear</a>&nbsp;&nbsp;&nbsp;
                     <a href="#" onclick="alarm()">Alarm</a>&nbsp;&nbsp;&nbsp;
                     <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
                 </div>
