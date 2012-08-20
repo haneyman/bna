@@ -69,8 +69,11 @@
                 });
 
                 //initializations
-                $('#debugLog').trigger( "expand" );
+                //$('#debugLog').trigger( "expand" );
+                $('#debugLog').hide();
                 //load gtfs schedule data
+                //files: http://www.bart.gov/schedules/developers/gtfs.aspx
+                //realtime: http://www.bart.gov/dev/gtrtfs/tripupdate.aspx
                 loadStations();
                 loadStopTimes();
                 //initialize trip to -- last used???
@@ -101,6 +104,7 @@
             }
 
             function getDepartingTrains() {
+                $('#departingTrains').html("");
                 $('#departingTrains').append("<li>" + "8 Car train arriving in 7 minutes." + "</li>");
                 $('#departingTrains').append("<li>" + "9 Car train arriving in 12 minutes." + "</li>");
                 $('#departingTrains').append("<li>" + "10 Car train arriving in 22 minutes." + "</li>");
@@ -186,6 +190,32 @@
             }
 
 
+            function getBartGtfsTripUpdates() {
+                callBartGtfsApi("http://www.bart.gov/dev/gtrtfs/tripupdate.aspx");
+
+            }
+
+
+            function callBartGtfsApi(url) {
+                log("callBartGTFSApi starting... " + url)
+                var result = null;
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    dataType: 'xml',
+                    async: false,
+                    success: function(data) {
+                        log("callBartApi success!");
+                        bartApiResult = data;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        log("callBartApi error:" + textStatus + "  " + jqXHR + " " + errorThrown);
+                    }
+                });
+            };
+            //************** GTFS ***********************************
+
+
             //****** START - ALARM STUFF *******************
             //check if ok to turn alarm on
             function alarmable() {
@@ -234,20 +264,26 @@
                 }
                 if (alarmType == 2 || alarmType == 3) {
                     navigator.notification.vibrate(2000);
-                }
 
+                }
+                alarmInterval = setInterval(alarmIntervalFunction,3000);
                 navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback, "BNA Alarm", "OK I'm awake");
                 //window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
                 //alarmInterval=setInterval(function(){alarmAlert()},3000);
             }
 
+            //called every X seconds until alarmCallback() is called.
+            function alarmIntervalFunction() {
+                navigator.notification.vibrate(2000);
+            }
+
             //called when they acknowlege alarm dialog
             function alarmCallback() {
                 log("alarmCallback()");
+                clearInterval(alarmInterval);
                 media.stop();
                 alarmOff();
                 media.release();
-                //alarmInterval.cancel();
             }
 
             function getGeo() {
@@ -558,7 +594,7 @@
                     <a href="#pageMap"  data-rel="dialog">BART Map</a>
                 </div>
                 <div data-role="fieldcontain">
-                    <label for="select-depart" >Select Departing Station</label>
+                    <label for="select-depart" ondblclick="$('#debugLog').toggle();">Select Departing Station</label>
                     <select id="select-depart" name="select-depart">
                         <option value="North Concord">North Concord</option>
                         <option value="Concord">Concord</option>
@@ -616,7 +652,7 @@
                     <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
                 </div>
             </div>
-            <footer data-role="footer"><h1>MTS</h1>Build 3</footer>
+            <!--<footer data-role="footer"><h1>MTS</h1>Build 3</footer>-->
         </section>
 
         <section id="pageMap" data-role="page">
