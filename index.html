@@ -1,746 +1,702 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/html">
-	<head>
-		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
-		<title>BNA</title>
-		<!--<link rel="stylesheet" href="assets/css/master.css" type="text/css" media="screen" />-->
-		<link rel="stylesheet" href="assets/css/jquery.mobile-1.1.1.min.css" type="text/css" media="screen" />
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
+<title>BNA</title>
+<!--<link rel="stylesheet" href="assets/css/master.css" type="text/css" media="screen" />-->
+<link rel="stylesheet" href="assets/css/jquery.mobile-1.1.1.min.css" type="text/css" media="screen" />
 
-		<script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
-		<script src="assets/js/audio.js" type="text/javascript" charset="utf-8"></script>
-		<script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
-        <script src="assets/js/prototype.js" type="text/javascript" charset="utf-8"></script>
-        <script src="assets/js/protobuf.js" type="text/javascript" charset="utf-8"></script>
-		<!--<script src="assets/js/xui.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/lawnchair/adaptors/LawnchairAdaptorHelpers.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/lawnchair/adaptors/DOMStorageAdaptor.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/lawnchair/adaptors/WebkitSQLiteAdaptor.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/lawnchair/Lawnchair.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/dsl.js" type="text/javascript" charset="utf-8"></script>-->
-		<!--<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>-->
-        <script type="text/javascript">
-            var MINUTES_BEFORE_ARRIVAL = 5;
-            var ALARM_SOUND_FILE_1 = 'assets/audio/alarmBig.mp3';
-            var isAlarmOn = false; //off, on, ??
-            var alarmType = 3; //0=none, 1=alarm, 2=vibrate, 3=both
-            var stationDepartAbbr = "";
-            var stationArriveAbbr = "";
-            var tripTime;//in seconds
-            var departTime;//hh:mm:ss
-            var arriveTime;//hh:mm:ss
-            var url = "";
-            var bartApiResult;
-            var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
-            var arrayStopTimes = [];
-            var arrayStations  = [];
-            var timeout;//holds setTimeout
-            var alarmInterval;//stores interval for sounding alarm
-            var media;
-            var tripUpdates = null;
+<script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
+<!--<script src="assets/js/xui.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/lawnchair/adaptors/LawnchairAdaptorHelpers.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/lawnchair/adaptors/DOMStorageAdaptor.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/lawnchair/adaptors/WebkitSQLiteAdaptor.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/lawnchair/Lawnchair.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/dsl.js" type="text/javascript" charset="utf-8"></script>-->
+<!--<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>-->
+<script type="text/javascript">
+var MINUTES_BEFORE_ARRIVAL = 5;
+var isAlarmOn = false; //off, on, ??
+var alarmType = 0; //0=none, 1=alarm, 2=vibrate, 3=both
+var stationDepartAbbr = "";
+var stationArriveAbbr = "";
+var tripTime;//in seconds
+var departTime;//Date of when train leaves the Start
+var arriveTime;//Date of when train arrives at End
+var url = "";
+var bartApiResult;
+var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
+var arrayStopTimes = [];
+var arrayStations  = [];
+var timeout;//holds setTimeout
 
-            jQuery(document).ready(function(){
-//                jQuery( "#progressbar" ).progressbar({
+$(document).ready(function(){
+//                $( "#progressbar" ).progressbar({
 //                    value: 0
 //                });
+    $('#departProgress').hide();
 
-                jQuery("[name=radio-alarm-state]").change(function() {
-                    isAlarmOn = jQuery('#radio-alarm-on').attr("checked")=="checked";
-                    log("Alarm switched to " + isAlarmOn);
-                    if (isAlarmOn)
-                        alarmOn();
-                    else
-                        alarmOff();
-                });
+    $("[name=radio-alarm-state]").change(function() {
+        isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
+        log("Alarm switched to " + isAlarmOn);
+        if (isAlarmOn)
+            alarmOn();
+        else
+            alarmOff();
+    });
 
-                jQuery("[name=radio-alarmtype]").change(function() {
-                    if ( jQuery('#radio-alarmtype-noise').attr("checked")=="checked")
-                        alarmType = 1;
-                    else if ( jQuery('#radio-alarmtype-vibrate').attr("checked")=="checked")
-                        alarmType = 2;
-                    else
-                        alarmType = 3;
-                    log("Alarm type is now" + alarmType);
-                });
+    $("[name=radio-alarmtype]").change(function() {
+        if ( $('#radio-alarmtype-noise').attr("checked")=="checked")
+            alarmType = 1;
+        else if ( $('#radio-alarmtype-vibrate').attr("checked")=="checked")
+            alarmType = 2;
+        else
+            alarmType = 3;
+        log("Alarm type is now" + alarmType);
+    });
 
-                jQuery('#select-depart').change(function() {
-                    newTrip();
-                });
-                jQuery('#select-arrive').change(function() {
-                    newTrip();
-                });
+    $('#select-depart').change(function() {
+        newTrip();
+    });
+    $('#select-arrive').change(function() {
+        newTrip();
+    });
 
-                //initializations
-                jQuery('#debugLog').trigger( "expand" );
-                //jQuery('#debugLog').hide();
-                //load gtfs schedule data
-                //files: http://www.bart.gov/schedules/developers/gtfs.aspx
-                //realtime: http://www.bart.gov/dev/gtrtfs/tripupdate.aspx
-                loadStations();
-                loadStopTimes();
-                //initialize trip to -- last used???
-                jQuery("#select-depart option:selected").val("");//TODO:not working, says "North Concord"
-                jQuery("#select-arrive option:selected").val("");
-                //initialize alarm off
-                alarmOff();
-                //initialize type to both
-                jQuery('#radio-alarmtype-noise').removeAttr('checked').checkboxradio("refresh");
-                jQuery('#radio-alarmtype-vibrate').removeAttr('checked').checkboxradio("refresh");
-                jQuery('#radio-alarmtype-both').attr('checked',true).checkboxradio("refresh");
-            });
+    //initializations
+    $('#debugLog').trigger( "expand" );
+    //switchAlarm(false);
+    loadStations();
+    loadStopTimes();
+    $("#select-depart option:selected").val("");//TODO:not working, says "North Concord"
+    $("#select-arrive option:selected").val("");
+    alarmOff();
+});
 
 
 
-            document.addEventListener("deviceready", onDeviceReady, false);
+document.addEventListener("deviceready", onDeviceReady, false);
 
-            function onDeviceReady() {
+function onDeviceReady() {
 
-            }
+}
 
-            function newTrip() {
-                alarmOff();
-                stationDepartAbbr = jQuery("#select-depart option:selected").val();
-                stationArriveAbbr = jQuery("#select-arrive option:selected").val();
-                tripTime = findTripTime(stationDepartAbbr, stationArriveAbbr);
-                log("Stations changed - newTrip is from " + stationDepartAbbr + " to " + stationArriveAbbr + "  Time=" + tripTime/60 + " minutes");
-            }
+function newTrip() {
+    alarmOff();
+    stationDepartAbbr = $("#select-depart option:selected").val();
+    stationArriveAbbr = $("#select-arrive option:selected").val();
+    if (stationDepartAbbr.length > 0 && stationArriveAbbr.length > 0) {
+        $('#departProgress').show();
+        tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr);
+        log("Stations changed in newTrip() from " + stationDepartAbbr + "(" + formatDateToTime(departTime) + ") to " + stationArriveAbbr + "(" + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes");
+        if (tripTime != null) {
+            $('#departProgress').hide();
+            $('#departTime').html(formatDateToTime(departTime)).show();
+            $('.arriveTime').html(formatDateToTime(arriveTime)).show();
+        }
+    }
+}
 
-            function getDepartingTrains() {
-                jQuery('#departingTrains').html("");
-                jQuery('#departingTrains').append("<li>" + "8 Car train arriving in 7 minutes." + "</li>");
-                jQuery('#departingTrains').append("<li>" + "9 Car train arriving in 12 minutes." + "</li>");
-                jQuery('#departingTrains').append("<li>" + "10 Car train arriving in 22 minutes." + "</li>");
-                jQuery('#departingTrains').append("<li>" + "TEST DATA!!!" + "</li>");
-                jQuery('#departingTrains').listview('refresh');
-            }
+//**************** utilities **************************************************
+
+
+function log(msg) {
+    $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+}
+
+function clearLog(msg) {
+    $('#log').html("Cleared.");
+}
 
 
 
-            //*********** CSV - GTFS ***************************************************************
-            //currently data is located local in /gtfs
-            //
-            //loads a massive file of times by sched, origin, dest
-            function loadStopTimes() {
-                //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
-                var csvfile = "gtfs/stop_times.txt";
-                log("loading gtfs stoptimes...");
-                jQuery.ajax({
-                    url : csvfile,
-                    dataType : "text",
-                    success : function (data) {
-                        arrayStopTimes = jQuery.csv()(data);
-                    }
-                });
-                log("   gtfs stoptimes loaded.");
-            }
+function getCurrentTime() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+    var time="";
+    if(hours > 11){
+        time = (hours - 12) + ":" + minutes + ":" + seconds + " ";
+        time +=" PM";
+    } else {
+        time = hours + ":" + minutes + ":" + seconds + " ";
+        time += " AM";
+    }
+    return time;
+}
 
-            function loadStations() {
-                var abbr = "?";
-                var name = "?";
-                var options = "";
-                var csvfile = "gtfs/stops.txt";
-                log("loading gtfs stations...");
-                jQuery.ajax({
-                    url : csvfile,
-                    dataType : "text",
-                    async : false,
-                    success : function (data) {
-                        arrayStations = jQuery.csv()(data);
-                        //alert("length:" + arrayStations.length);
-                    }
-                });
+function getCurrentTimeHHMMSS() {
+    var currentTime = new Date();
+    var hours = currentTime.getHours();
+    var minutes = currentTime.getMinutes();
+    var seconds = currentTime.getSeconds();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+    time = hours + ":" + minutes + ":" + seconds + " ";
+    return time;
+}
 
-                //load the <select> for origin and destination
-                options += '<option selected="selected" value="' + "" + '">' + "   " + '</option>';
-                for (i=1; i < arrayStations.length; i++) {
-                    station = arrayStations[i];
-                    abbr = station[0];
-                    name = station[1];
-                    options += '<option value="' + abbr + '">' + name + '</option>';
+//times are assumed in hh:mm:ss format
+//returns in seconds
+function timeDiff(time1, time2) {
+    var time1ss = HMStoSec1(time1);
+    var time2ss = HMStoSec1(time2);
+    var diffss = (time2ss - time1ss);
+    var diffmm =  diffss / 60;
+    log("Time diff = " + diffmm + " minutes");
+    return diffss;
+}
+
+//takes in hh:mm:ss and returns seconds
+function HMStoSec1(T) { // h:m:s
+    var A = T.split(/\D+/) ;
+    return (A[0]*60 + +A[1])*60 + +A[2];
+}
+
+//adds specified number of seconds to the time hh:mm:ss
+function addToTime(time, addSeconds) {
+
+}
+//*********** CSV - GTFS ***************************************************************
+//currently data is located local in /gtfs
+//
+//loads a massive file of times by sched, origin, dest
+function loadStopTimes() {
+    //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
+    var csvfile = "gtfs/stop_times.txt";
+    log("loading gtfs stoptimes...");
+    $.ajax({
+        url : csvfile,
+        dataType : "text",
+        success : function (data) {
+            arrayStopTimes = jQuery.csv()(data);
+        }
+    });
+    log("   gtfs stoptimes loaded.");
+}
+
+function loadStations() {
+    var abbr = "?";
+    var name = "?";
+    var options = "";
+    var csvfile = "gtfs/stops.txt";
+    log("loading gtfs stations...");
+    $.ajax({
+        url : csvfile,
+        dataType : "text",
+        async : false,
+        success : function (data) {
+            arrayStations = jQuery.csv()(data);
+            //alert("length:" + arrayStations.length);
+        }
+    });
+
+    //load the <select> for origin and destination
+    options += '<option selected="selected" value="' + "" + '">' + "   " + '</option>';
+    for (i=1; i < arrayStations.length; i++) {
+        station = arrayStations[i];
+        abbr = station[0];
+        name = station[1];
+        options += '<option value="' + abbr + '">' + name + '</option>';
+    }
+    log("   gtfs stations loaded.");
+    $('#select-depart').html(options);
+    $('#select-arrive').html(options);
+}
+
+
+
+//looks in arrayStopTimes to find orig and dest and returns time
+function getTripTime(orig, dest) {
+    if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
+        return;
+    log("finding trip time for orig:" + orig + "   dest:" + dest);
+    departTime = null;
+    arriveTime = null;
+    var now = new Date();
+    var dayNames = new Array("SUN","MON","TUE","WED","THU","FRI","SAT");
+    var day = dayNames[now.getDay()];
+
+    var stopTimeTripId;
+    var currentTripId;
+    var origSequence=0;
+    var stopTimeSequence;
+    var stopTimeStopId;
+    var inRoute = false;
+    var stopTime = [];
+    var stopTimeDepartTime = "";
+    var stopTimeDepartTimeAsDate = new Date();
+    var mm = $.trim(now.getMonth() + 1);//zero based for some bizarre reason
+    if (mm.length == 1)
+        mm = "0" + mm;
+    var dd = $.trim(now.getDate());
+    if (dd.length == 1)
+        dd = "0" + dd;
+    //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
+    //Look in stop times for a match to orig, then find dest where it is in same trip and
+    //sequence is higher and departure time is closest prior to current time
+    var currentTime = getCurrentTimeHHMMSS();
+    var timeString = "";
+    log("current time is " + currentTime + "  and the day is " + day);
+    for (i=0; i < arrayStopTimes.length; i++) {
+        stopTime = arrayStopTimes[i];
+        stopTimeTripId = stopTime[0];
+        stopTimeDepartTime = stopTime[1];//arrival_time, when they are at station
+        if (stopTimeDepartTime.length == 7)
+            stopTimeDepartTime = "0" + stopTimeDepartTime;//javascript requires hh format or craps out
+        timeString = now.getFullYear() + "-" + mm + "-" + dd + "T" + stopTimeDepartTime;
+        stopTimeDepartTimeAsDate = new Date(Date.parse(timeString));
+        stopTimeStopId = stopTime[3];
+        stopTimeSequence = stopTime[4];
+        //log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
+        if ((stopTimeTripId.indexOf("SUN") >= 0 && day == "SUN")
+                || (stopTimeTripId.indexOf("SAT") >= 0 && day == "SAT")
+                || (stopTimeTripId.indexOf("SAT") < 0 && !stopTimeTripId.indexOf("SUN") < 0)) {
+            if (stopTimeStopId == orig) { //matching origin
+                if (stopTimeDepartTimeAsDate < now  //previous to current time
+                        && stopTimeDepartTimeAsDate > departTime) {//more recent the current match
+                    inRoute = true;
+                    origSequence = stopTimeSequence;
+                    currentTripId = stopTimeTripId;
+                    departTime = stopTimeDepartTimeAsDate;
+                    //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + origTime);
                 }
-                log("   gtfs stations loaded.");
-                jQuery('#select-depart').html(options);
-                jQuery('#select-arrive').html(options);
-            }
-
-
-
-            //looks in arrayStopTimes to find orig and dest and returns time
-            function findTripTime(orig, dest) {
-                //iterate through
-                var inRoute = false;
-                var stopTime = [];
-                var origTime = "";
-                var destTime = "";
-                //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
-                for (i=0; i < arrayStopTimes.length; i++) {
-                    stopTime = arrayStopTimes[i];
-                    if (stopTime[3] == orig) {
-                        inRoute = true;
-                        origTime = stopTime[1];
-                    }
-                    if (inRoute) {
-                        if (stopTime[3] == dest) {
-                            destTime = stopTime[1];
-                            break;
-                        }
-                    }
-                }
-                log("found trip- orig:" + origTime + " dest:" + destTime);
-                //until this is more accurate, surmise the actual arriveTime
-                return (timeDiff(origTime, destTime))
-            }
-
-
-            var tripUpdate = {
-                header: {
-                    1: {name: 'gtfs_realtime_version', type: 'string', rule: 'optional'},
-                    2: {name: 'incrementality', type: 'string', rule: 'optional'},
-                    3: {name: 'timestamp', type: 'int32', rule: 'optional'}
-                },
-                entity: {
-                    1: {id: "id", type: 'string', rule: 'optional'}
-                },
-                trip_update: {
-                    trip: {
-                        1: {name: 'trip_id', type: 'string', rule: 'optional'}
-                    },
-                    stop_time_update: [{
-                        1: {name: 'stop_sequence', type: 'string', rule: 'optional'},
-                        arrival: {
-                            1: {name: 'delay', type: 'string', rule: 'optional'}
-                        }
-                    }]
-                }
-            };
-
-
-
-
-            function getBartGtfsTripUpdates() {
-                //callBartGtfsApi("http://www.bart.gov/dev/gtrtfs/tripupdate.aspx");
-                var url = "http://www.bart.gov/dev/gtrtfs/tripupdate.aspx";
-                //var url = "http://www.bart.gov/dev/gtrtfs/tripupdate.aspx?callback=?";
-//                log("calling bart gtfs url " + url + "...");
-/*
-                jQuery.ajax({
-                    url: url,
-                    dataType: 'text',
-                    crossDomain: true,
-                    //timeout: 10000,
-                    success: function(data) {
-                        alert('success!' );
-                        //console.log('ajax protobuf success: ' + data);
-                        //response = data;
-                    },
-                    error: function(xhr, status, error) {
-                        alert('You gots error:' + error + '  status:' + status);
-                    },
-                    //async: false,
-                    //jsonp: true,
-                    jsonpCallback: 'gotData'
-                });*/
-
-
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', url);
-                xhr.onload = function(e) {
-                    alert('done' + this.response);
-                };
-                xhr.send();
-
-
-                //tripUpdate = new Protobuf.Decoder(tripUpdates).decodeUrl(url);
-                log("Trip Updates received: " + tripUpdates);
-            }
-
-            function gotData(data) {
-                log('gotdata');
-                //alert('gotdata:' + data);
-            }
-
-            /*
-                        function callBartGtfsApi(url) {
-                            log("callBartGTFSApi starting... " + url)
-                            var result = null;
-                            jQuery.ajax({
-                                url: url,
-                                type: 'get',
-                                dataType: 'xml',
-                                async: false,
-                                success: function(data) {
-                                    log("callBartApi success!");
-                                    bartApiResult = data;
-                                },
-                                error: function(jqXHR, textStatus, errorThrown) {
-                                    log("callBartApi error:" + textStatus + "  " + jqXHR + " " + errorThrown);
-                                }
-                            });
-                        };
-            */
-            //************** GTFS ***********************************
-
-
-            //****** START - ALARM STUFF *******************
-            //check if ok to turn alarm on
-            function alarmable() {
-                if (stationDepartAbbr == "") {
-                    alert("You need an Departing Station");
-                    alarmOff();
-                    return false;
-                }
-                if (stationArriveAbbr == "") {
-                    alert("You need an Arriving Station");
-                    alarmOff();
-                    return false;
-                }
-
-                return true;
-            }
-
-            //handler to turn on alarm
-            function alarmOn() {
-                if (alarmable()) {
-                    log("alarm ON");
-                    jQuery('#alarmStatus').show();
-                    departTime = new Date();//TODO: Setting departTime to current time for now
-                    arriveTime = new Date();
-                    arriveTime.setTime(departTime.getTime() + (tripTime * 1000));//tripTime is in seconds
-                    log("  departTime = " + formatTime(departTime) + "  arrive:" + formatTime(arriveTime));
-                    timeout=setTimeout(function(){updateAlarmDisplay()},1000);
-                }
-            }
-
-            //handler to turn OFF alarm
-            function alarmOff() {
-                clearTimeout(timeout);
-                jQuery('#alarmStatus').hide();
-                jQuery('#radio-alarm-on').removeAttr('checked').checkboxradio("refresh");
-                jQuery('#radio-alarm-off').attr('checked',true).checkboxradio("refresh");
-                log("alarmOff()");
-            }
-
-            //alert sound/vibrate the alarm
-            function alarm() {
-                log("ALARM!! Type is " + alarmType);
-                if (alarmType == 1 || alarmType == 3) {
-                    //navigator.notification.beep(5);
-                    playSound(ALARM_SOUND_FILE_1);
-                }
-                if (alarmType == 2 || alarmType == 3) {
-                    navigator.notification.vibrate(2000);
-
-                }
-                alarmInterval = setInterval(alarmIntervalFunction,3000);
-                navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback, "BNA Alarm", "OK I'm awake");
-                //window.plugins.statusBarNotification.notify("BNA Alert", "Wake UP!!!  You are near your station.");
-                //alarmInterval=setInterval(function(){alarmAlert()},3000);
-            }
-
-            //called every X seconds until alarmCallback() is called.
-            function alarmIntervalFunction() {
-                navigator.notification.vibrate(2000);
-            }
-
-            //called when they acknowlege alarm dialog
-            function alarmCallback() {
-                log("alarmCallback()");
-                clearInterval(alarmInterval);
-                media.stop();
-                alarmOff();
-                media.release();
-            }
-
-            function getGeo() {
-                //log("calling geolocation.getCurrentPosition...");
-                //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
-                //log("geolocation.getCurrentPosition complete.");
-                //
-                // Options: throw an error if no update is received every 30 seconds.
-                //
-                //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
-            }
-
-            //called via setTimout every second
-            function updateAlarmDisplay() {
-                //log("updateAlarm()")
-                jQuery('#arriveTime').html(formatTime(arriveTime));
-                var diff = (arriveTime.getTime() - new Date().getTime()) ;
-
-                jQuery('#timeRemaining').html(formatMilliseconds(diff));
-                //jQuery('#progressbar').val(diff / tripTime);
-                if (diff < MINUTES_BEFORE_ARRIVAL * 1000 * 60) {
-                    //if (diff < 0)
-                    //    jQuery('#timeRemaining').html("ARRIVED");
-                    //else
-                    log(" time remaining less than " + MINUTES_BEFORE_ARRIVAL);
-                    alarm();
+            } else {
+                if (stopTimeTripId != currentTripId){ // || stopTimeSequence < origSequence) {
+                    //new trip, look for orig again
+                    //log("dest rejected  " + stopTimeTripId + "  " + currentTripId + "  " + stopTimeSequence + "  " + origSequence)
+                    currentTripId = stopTimeTripId;
+                    inRoute = false;
                 } else {
-                    timeout=setTimeout(function(){updateAlarmDisplay()},5000);
-                }
-            }
-
-
-            function playSound(soundFile) {
-                if (device.platform == 'Android') {
-                    soundFile = '/android_asset/www/' + soundFile;///android_asset/www
-                }
-                log("playSound() of: " + soundFile) ;
-    //            if(media != null)
-    //            {
-    //                media.release();
-    //                media = null;
-    //            }
-                media = new Media(soundFile, onMediaSuccess, onMediaError);
-                //media.seekTo(0);
-                media.play({ numberOfLoops: 1, playAudioWhenScreenIsLocked : true });
-                //log("playSound() complete.");
-                //alert("Do it work?");
-                //playAudio(ALARM1);
-            }
-
-            function onMediaSuccess() {
-                log("onMediaSuccess()");
-            }
-
-            function onMediaError(e) {
-                log("onMediaError(): msg = " + e.message + " code: " + e.code);
-            }
-
-            //****** END - ALARM STUFF *******************
-
-            //*********** BART API ***************************************************************
-/*
-            function callBartApi(url) {
-                log("callBartApi starting... " + url)
-                var result = null;
-                jQuery.ajax({
-                    url: url,
-                    type: 'get',
-                    dataType: 'xml',
-                    async: false,
-                    success: function(data) {
-                        log("callBartApi success!");
-                        bartApiResult = data;
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        log("callBartApi error:" + textStatus + "  " + jqXHR + " " + errorThrown);
+                    if (inRoute) {
+                        if (stopTimeStopId == dest) {
+                            //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime)
+                            arriveTime = stopTimeDepartTimeAsDate;//remember the Date
+                            inRoute = false;//keep looking for better times
+                            //break;
+                        }
                     }
-                });
-            };
-
-            //    <name>12th St. Oakland City Center</name><abbr>12TH</abbr><gtfs_latitude>37.803664</gtfs_latitude><gtfs_longitude>-122.271604</gtfs_longitude><address>1245 Broadway</address><city>Oakland</city><county>alameda</county><state>CA</state><zipcode>94612</zipcode>
-            function getBartStationsApi() {
-                //http://api.bart.gov/docs/overview/index.aspx
-                //http://www.bart.gov/schedules/developers/index.aspx
-                //key UBHV-T2TG-U2UQ-2VA5
-                // arrivals http://www.bart.gov/dev/eta/bart_eta.xml //
-                var abbr = "?";
-                var name = "?";
-                var options = "";
-                callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stns" + BART_API_KEY );
-                jQuery(bartApiResult).find('station').each(function(){
-                    abbr = "?";
-                    name = "?";
-                    jQuery(this).find('name').each(function(){
-                        name = jQuery(this).text();
-                    });
-                    jQuery(this).find('abbr').each(function(){
-                        abbr = jQuery(this).text();
-                    });
-                    //save to cache??????
-                    options += '<option value="' + abbr + '">' + name + '</option>';
-                });
-                jQuery('#select-depart').html(options);
-                jQuery('#select-arrive').html(options);
+                }
             }
-            //
-            function getStationSchedule(origStation) {
-                var abbr = "?";
-                var name = "?";
-                var options = "";
-                callBartApi("http://api.bart.gov/api/sched.aspx?cmd=stnsched&orig=" + origStation + BART_API_KEY );
-                jQuery(bartApiResult).find('item').each(function(){
-                    //line, trainHeadStation, origTime, destTime, trainIdx
-
-                    jQuery(this).find('trainHeadStation').each(function(){
-                        trainHeadStation = jQuery(this).text();
-                    });
-                    jQuery(this).find('origTime').each(function(){
-                        origTime = jQuery(this).text();
-                    });
-                    jQuery(this).find('origTime').each(function(){
-                        destTime = jQuery(this).text();
-                    });
-                    //save to cache??????
-                    options += '<option value="' + abbr + '">' + name + '</option>';
-                });
-                jQuery('#select-depart').html(options);
-                jQuery('#select-arrive').html(options);
-            }
-
-            //
-            function getBartRoutes() {
-                var scheduleNumber = "?";
-                var name = "?";
-                var options = "";
-                callBartApi("http://api.bart.gov/api/route.aspx?cmd=routes&date=now" + BART_API_KEY );
-                //route -
-                jQuery(bartApiResult).find('sched_num').each(function(){
-                    scheduleNumber = jQuery(this).text();
-                });
+        } //else
+    }
+    if (arriveTime != null && departTime != null) {
+        log("Trip found starting at " + departTime + "   arriving at " + arriveTime)
+        return (arriveTime - departTime)/1000;//in seconds
+//                    return (timeDiff(origTime, destTime))
+    } else {
+        log("ERROR - No trip found.");
+        alert("ERROR - Could not find a trip in the BART schedule.");
+        return null;
+    }
+}
 
 
+//****** START - ALARM STUFF *******************
+//alert
+function alarm() {
+    log("ALARM!!");
+    navigator.notification.alert("Wakey, wakey, you are approaching your station.", alarmCallback(), "Wakey", "Okie Dokie");
+    if (alarmType == 1 || alarmType == 3) {
+        navigator.notification.beep(5);
+    }
+    if (alarmType == 2 || alarmType == 3) {
+        navigator.notification.vibrate(2000);
+    }
+}
 
-            }
+//check if ok to turn alarm on
+function alarmable() {
+    if (stationDepartAbbr == "") {
+        alert("You need an Departing Station");
+        alarmOff();
+        return false;
+    }
+    if (stationArriveAbbr == "") {
+        alert("You need an Arriving Station");
+        alarmOff();
+        return false;
+    }
 
-            // gets a list of routes for a station
-            function getBartStationDetail(station) {
-                var routes = new Array();
-                callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stninfo&orig=" + station + BART_API_KEY );
-                jQuery(bartApiResult).find('station').each(function(){
-                    //each station has multiple routes - name, abbr, routeID, number, color
-                    jQuery(bartApiResult).find('route').each(function(){
-                        routes.push(jQuery(this).text());
-                    });
-                });
-            }
+    return true;
+}
 
-            // get route info - name, abbr, routID, number, origin, destination, direction, color, holidays, num_stns, config (list of stations)
-            function getBartRoute(routeNum) {
-                //var routes = new Array();
-                callBartApi("http://api.bart.gov/api/route.aspx?cmd=routeinfo&route=" + routeNum + BART_API_KEY );
-                jQuery(bartApiResult).find('station').each(function(){
-                    //each station has multiple routes - name, abbr, routeID, number, color
-                    jQuery(bartApiResult).find('route').each(function(){
-                        routes.push(jQuery(this).text());
-                    });
-                });
-            }
+function getGeo() {
+    //log("calling geolocation.getCurrentPosition...");
+    //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+    //log("geolocation.getCurrentPosition complete.");
+    //
+    // Options: throw an error if no update is received every 30 seconds.
+    //
+    //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
+}
+
+function alarmOn() {
+    if (alarmable()) {
+        log("alarm ON");
+        $('#alarmStatus').show();
+        //departTime = new Date();//TODO: Setting departTime to current time for now
+        //arriveTime = new Date();
+        //arriveTime.setTime(departTime.getTime() + (tripTime * 1000));//tripTime is in seconds
+        log("  departTime = " + formatDateToTime(departTime) + "  arrive:" + formatDateToTime(arriveTime));
+        timeout=setTimeout(function(){updateAlarmDisplay()},1000);
+    }
+}
+
+//called via setTimout every second
+function updateAlarmDisplay() {
+    //log("updateAlarm()")
+    $('.arriveTime').html(formatDateToTime(arriveTime));
+    var diff = (arriveTime.getTime() - new Date().getTime()) ;
+
+    $('#timeRemaining').html(formatMilliseconds(diff));
+    $('#progressbar').val(diff / tripTime);
+    if (diff < MINUTES_BEFORE_ARRIVAL * 1000 * 60) {
+        //if (diff < 0)
+        //    $('#timeRemaining').html("ARRIVED");
+        //else
+        log(" time remaining less than " + MINUTES_BEFORE_ARRIVAL);
+        alarm();
+    } else {
+        timeout=setTimeout(function(){updateAlarmDisplay()},5000);
+    }
+}
+
+function alarmOff() {
+    clearTimeout(timeout);
+    $('#alarmStatus').hide();
+    $('#radio-alarm-on').removeAttr('checked').checkboxradio("refresh");
+    $('#radio-alarm-off').attr('checked',true).checkboxradio("refresh");
+    log("alarmOff()");
+}
+
+//formats a date into hh:mm:ss
+function formatDateToTime(date) {
+    log("Date:" + date)
+    var ampm;
+    if (date == null)
+        return date;
+    var h=date.getHours();
+    if (h > 11) {
+        ampm = "PM";
+        if (h > 12)
+            h = h - 12;
+    } else
+        ampm = "AM";
+    var m=date.getMinutes();
+    var s=date.getSeconds();
+    // add a zero in front of numbers<10
+    m=padTime(m);
+    s=padTime(s);
+    return h + ":" + m + " " + ampm;
+}
+
+function formatMilliseconds(ms) {
+    var x = ms / 1000;
+    var seconds = x % 60;
+    x /= 60;
+    minutes = x % 60;
+    minutes = Math.floor(minutes);
+    x /= 60;
+    hours = x % 24;
+    hours = Math.floor(hours);
+    x /= 2;
+    var result = "";
+    if (hours > 0)
+        result = hours + " hrs ";
+    result += minutes + " min ";
+    return result;
+}
+
+function padTime(i) {
+    if (i<10)
+        i="0" + i;
+    return i;
+}
+
+function alarmCallback() {
+    //cancel alarm?
+}
+//****** END - ALARM STUFF *******************
+
+
+
+
+//*********** BART API ***************************************************************
+/*
+ function callBartApi(url) {
+ log("callBartApi starting... " + url)
+ var result = null;
+ $.ajax({
+ url: url,
+ type: 'get',
+ dataType: 'xml',
+ async: false,
+ success: function(data) {
+ log("callBartApi success!");
+ bartApiResult = data;
+ },
+ error: function(jqXHR, textStatus, errorThrown) {
+ log("callBartApi error:" + textStatus + "  " + jqXHR + " " + errorThrown);
+ }
+ });
+ };
+
+ //    <name>12th St. Oakland City Center</name><abbr>12TH</abbr><gtfs_latitude>37.803664</gtfs_latitude><gtfs_longitude>-122.271604</gtfs_longitude><address>1245 Broadway</address><city>Oakland</city><county>alameda</county><state>CA</state><zipcode>94612</zipcode>
+ function getBartStationsApi() {
+ //http://api.bart.gov/docs/overview/index.aspx
+ //http://www.bart.gov/schedules/developers/index.aspx
+ //key UBHV-T2TG-U2UQ-2VA5
+ // arrivals http://www.bart.gov/dev/eta/bart_eta.xml //
+ var abbr = "?";
+ var name = "?";
+ var options = "";
+ callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stns" + BART_API_KEY );
+ $(bartApiResult).find('station').each(function(){
+ abbr = "?";
+ name = "?";
+ $(this).find('name').each(function(){
+ name = $(this).text();
+ });
+ $(this).find('abbr').each(function(){
+ abbr = $(this).text();
+ });
+ //save to cache??????
+ options += '<option value="' + abbr + '">' + name + '</option>';
+ });
+ $('#select-depart').html(options);
+ $('#select-arrive').html(options);
+ }
+ //
+ function getStationSchedule(origStation) {
+ var abbr = "?";
+ var name = "?";
+ var options = "";
+ callBartApi("http://api.bart.gov/api/sched.aspx?cmd=stnsched&orig=" + origStation + BART_API_KEY );
+ $(bartApiResult).find('item').each(function(){
+ //line, trainHeadStation, origTime, destTime, trainIdx
+
+ $(this).find('trainHeadStation').each(function(){
+ trainHeadStation = $(this).text();
+ });
+ $(this).find('origTime').each(function(){
+ origTime = $(this).text();
+ });
+ $(this).find('origTime').each(function(){
+ destTime = $(this).text();
+ });
+ //save to cache??????
+ options += '<option value="' + abbr + '">' + name + '</option>';
+ });
+ $('#select-depart').html(options);
+ $('#select-arrive').html(options);
+ }
+
+ //
+ function getBartRoutes() {
+ var scheduleNumber = "?";
+ var name = "?";
+ var options = "";
+ callBartApi("http://api.bart.gov/api/route.aspx?cmd=routes&date=now" + BART_API_KEY );
+ //route -
+ $(bartApiResult).find('sched_num').each(function(){
+ scheduleNumber = $(this).text();
+ });
+
+
+
+ }
+
+ // gets a list of routes for a station
+ function getBartStationDetail(station) {
+ var routes = new Array();
+ callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stninfo&orig=" + station + BART_API_KEY );
+ $(bartApiResult).find('station').each(function(){
+ //each station has multiple routes - name, abbr, routeID, number, color
+ $(bartApiResult).find('route').each(function(){
+ routes.push($(this).text());
+ });
+ });
+ }
+
+ // get route info - name, abbr, routID, number, origin, destination, direction, color, holidays, num_stns, config (list of stations)
+ function getBartRoute(routeNum) {
+ //var routes = new Array();
+ callBartApi("http://api.bart.gov/api/route.aspx?cmd=routeinfo&route=" + routeNum + BART_API_KEY );
+ $(bartApiResult).find('station').each(function(){
+ //each station has multiple routes - name, abbr, routeID, number, color
+ $(bartApiResult).find('route').each(function(){
+ routes.push($(this).text());
+ });
+ });
+ }
  */
 
-            //********** GPS STUFF *****************************************************************
-            // onSuccess Geolocation
-            //
-            function onGeoSuccess(position) {
-                var element = document.getElementById('geolocation');
-                element.innerHTML = 'Latitude: ' + position.coords.latitude            + '<br />' +
-                        'Longitude: '          + position.coords.longitude             + '<br />' +
-                        'Altitude: '           + position.coords.altitude              + '<br />' +
-                        'Accuracy: '           + position.coords.accuracy              + '<br />' +
-                        'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-                        'Heading: '            + position.coords.heading               + '<br />' +
-                        'Speed: '              + position.coords.speed                 + '<br />' +
-                        'Timestamp: '          + position.timestamp                    + '<br />';
-            }
+//********** GPS STUFF *****************************************************************
+// onSuccess Geolocation
+//
+function onGeoSuccess(position) {
+    var element = document.getElementById('geolocation');
+    element.innerHTML = 'Latitude: ' + position.coords.latitude            + '<br />' +
+            'Longitude: '          + position.coords.longitude             + '<br />' +
+            'Altitude: '           + position.coords.altitude              + '<br />' +
+            'Accuracy: '           + position.coords.accuracy              + '<br />' +
+            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+            'Heading: '            + position.coords.heading               + '<br />' +
+            'Speed: '              + position.coords.speed                 + '<br />' +
+            'Timestamp: '          + position.timestamp                    + '<br />';
+}
 
-            // onError Callback receives a PositionError object
-            //
-            function onGeoError(error) {
-                alert('code: '    + error.code    + '\n' +
-                        'message: ' + error.message + '\n');
-            }
-
-
-            // onSuccess Callback
-            //   This method accepts a `Position` object, which contains
-            //   the current GPS coordinates
-            //
-            function onWatchSuccess(position) {
-                var element = document.getElementById('geolocation');
-                element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
-                        'Longitude: ' + position.coords.longitude     + '<br />' +
-                        '<hr />'      + element.innerHTML;
-            }
-
-            // onError Callback receives a PositionError object
-            //
-            function onWatchError(error) {
-                alert('code: '    + error.code    + '\n' +
-                        'message: ' + error.message + '\n');
-            }
-            //********** END - GPS STUFF *****************************************************************
-
-            //**************** utilities **************************************************
-
-            function log(msg) {
-
-                jQuery('#log').append("<br/>********** " + getCurrentTime() + " - " + msg);
-                console.log(msg);
-            }
-
-            function getCurrentTime() {
-                var currentTime = new Date();
-                var hours = currentTime.getHours();
-                var minutes = currentTime.getMinutes();
-                var seconds = currentTime.getSeconds();
-                if (minutes < 10) {
-                    minutes = "0" + minutes;
-                }
-                if (seconds < 10) {
-                    seconds = "0" + seconds;
-                }
-                var time = hours + ":" + minutes + ":" + seconds + " ";
-                if(hours > 11){
-                    time +=" PM";
-                } else {
-                    time += " AM";
-                }
-                return time;
-            }
-
-            //times are assumed in hh:mm:ss format
-            //returns in seconds
-            function timeDiff(time1, time2) {
-                var time1ss = HMStoSec1(time1);
-                var time2ss = HMStoSec1(time2);
-                var diffss = (time2ss - time1ss);
-                var diffmm =  diffss / 60;
-                log("Time diff = " + diffmm + " minutes");
-                return diffss;
-            }
-
-            //takes in hh:mm:ss and returns seconds
-            function HMStoSec1(T) { // h:m:s
-                var A = T.split(/\D+/) ;
-                return (A[0]*60 + +A[1])*60 + +A[2];
-            }
-
-            //adds specified number of seconds to the time hh:mm:ss
-            function addToTime(time, addSeconds) {
-
-            }
+// onError Callback receives a PositionError object
+//
+function onGeoError(error) {
+    alert('code: '    + error.code    + '\n' +
+            'message: ' + error.message + '\n');
+}
 
 
-            //formats a date into hh:mm:ss
-            function formatTime(date) {
-                var h=date.getHours();
-                var m=date.getMinutes();
-                var s=date.getSeconds();
-                // add a zero in front of numbers<10
-                m=padTime(m);
-                s=padTime(s);
-                return h + ":" + m + ":" + s;
-            }
+// onSuccess Callback
+//   This method accepts a `Position` object, which contains
+//   the current GPS coordinates
+//
+function onWatchSuccess(position) {
+    var element = document.getElementById('geolocation');
+    element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
+            'Longitude: ' + position.coords.longitude     + '<br />' +
+            '<hr />'      + element.innerHTML;
+}
 
-            function formatMilliseconds(ms) {
-                var x = ms / 1000;
-                var seconds = x % 60;
-                x /= 60;
-                minutes = x % 60;
-                minutes = Math.floor(minutes);
-                x /= 60;
-                hours = x % 24;
-                hours = Math.floor(hours);
-                x /= 2;
-                var result = "";
-                if (hours > 0)
-                    result = hours + " hrs ";
-                result += minutes + " min ";
-                return result;
-            }
-
-            function padTime(i) {
-                if (i<10)
-                    i="0" + i;
-                return i;
-            }
+// onError Callback receives a PositionError object
+//
+function onWatchError(error) {
+    alert('code: '    + error.code    + '\n' +
+            'message: ' + error.message + '\n');
+}
+//********** END - GPS STUFF *****************************************************************
 
 
 
-        </script>
-	</head>
-	<body>
-        <section id="page1" data-role="page" data-fullscreen="true">
-            <header data-role="header" ZZdata-position="fixed"><h1>BNA</h1></header>
-            <div class="content" data-role="content">
-                <p></p>
-                <div style="float:right">
-                    <a href="#pageMap"  data-rel="dialog">BART Map</a>
+
+</script>
+</head>
+<body>
+<section id="page1" data-role="page" data-fullscreen="true">
+    <header data-role="header" ZZdata-position="fixed"><h1>BNA</h1></header>
+    <div class="content" data-role="content">
+        <p></p>
+        <div style="float:right">
+            <a href="#pageMap"  data-rel="dialog">BART Map</a>
+        </div>
+        <div  data-role="fieldcontain">
+            <div style="float:left;width:350px">
+                <div style="float:left;margin-top: 7px;width: 100px;">
+                    <label for="select-depart" >Start</label>
                 </div>
-                <div data-role="fieldcontain">
-                    <label for="select-depart" ondblclick="jQuery('#debugLog').toggle();">Select Departing Station</label>
-                    <select id="select-depart" name="select-depart">
-                        <option value="North Concord">North Concord</option>
-                        <option value="Concord">Concord</option>
-                        <option value="Pleasant Hill">Pleasant Hill</option>
-                    </select>
+                <select id="select-depart" name="select-depart">
+                </select>
+            </div>
+            <div style="float:left;">
+                <div id="departProgress" >Searching...</div>
+                <div style="font-size: 12px;" id="departTime" ></div>
+            </div>
+        </div>
+        <div  data-role="fieldcontain">
+            <div style="float:left;width:350px">
+                <div style="float:left;margin-top: 7px;width: 100px;">
+                    <label for="select-arrive" >End</label>
                 </div>
-                <div data-role="fieldcontain">
-                    <label for="select-arrive" >Select Arriving Station</label>
-                    <select id="select-arrive" name="select-arrive">
-                    </select>
-                </div>
-                <fieldset data-role="controlgroup" data-type="horizontal">
-                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
-                    <label for="radio-alarmtype-noise">Alarm</label>
-                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
-                    <label for="radio-alarmtype-vibrate">Vibrate</label>
-                    <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
-                    <label for="radio-alarmtype-both">Both</label>
+                <select id="select-arrive" name="select-arrive">
+                </select>
+            </div>
+            <div style="float:left;">
+                <div style="font-size: 12px;" class="arriveTime" ></div>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        <!--<div style="float:right">Time</div>-->
+        <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
+            <div style="float:left;margin-top:10px;">Alarm Type</div>
+            <div style="float:left;margin-left:85px;">
+                <input type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
+                <label for="radio-alarmtype-noise">Alarm</label>
+                <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
+                <label for="radio-alarmtype-vibrate">Vibrate</label>
+                <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
+                <label for="radio-alarmtype-both">Alarm/Vibrate</label>
+            </div>
+        </fieldset>
+
+
+        <div data-role="fieldcontain" style="">
+            <div style="float:left;margin-top:10px;">ON / OFF</div>
+            <div style="margin-left:163px">
+                <fieldset id="radio-alarm-state" data-role="controlgroup" data-type="horizontal">
+                    <!--<legend>Alarm:</legend>-->
+                    <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
+                    <label for="radio-alarm-on"  style="color:green">Alarm ON</label>
+                    <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
+                    <label for="radio-alarm-off" style="color:red">Alarm OFF</label>
                 </fieldset>
-
-
-                <div data-role="fieldcontain">
-                    <fieldset data-role="controlgroup" data-type="horizontal">
-                        <!--<legend>Alarm:</legend>-->
-                        <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
-                               <label for="radio-alarm-on" >Alarm ON</label>
-                        <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
-                               <label for="radio-alarm-off" >Alarm OFF</label>
-                   </fieldset>
-                </div>
-
-
-                <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; overflow: hidden;text-align: center">
-                    Projected Arrival Time <span id="arriveTime">?</span>
-                    <br />
-                    <span id="timeRemaining" style="font-size: 32px;">??:??</span>
-                    <div id="progressbar"></div>
-                </div>
-                <!--<audio src="SilversunPickupsLazyEye.mp3" controls preload="auto" autobuffer></audio>-->
-                <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
-
-                <div id="departingTrainsDiv" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
-                    <h3>Departing Trains</h3>
-                    <button value="" style="" onclick="getDepartingTrains()">Refresh</button>
-                    <br/>
-                    <!--<div id="departingTrains"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>-->
-                    <ul id="departingTrains"   data-role="listview" data-theme="c"></ul>
-                </div>
-
-                <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
-                    <h3>Debug Log</h3>
-                    <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="jQuery('log').html('');">Clear</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="alarm()">Alarm</a>&nbsp;&nbsp;&nbsp;
-                    <a href="#" onclick="getBartGtfsTripUpdates();">Get GTFS</a>&nbsp;&nbsp;&nbsp;
-                    <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
-                </div>
             </div>
-            <!--<footer data-role="footer"><h1>MTS</h1>Build 3</footer>-->
-        </section>
-
-        <section id="pageMap" data-role="page">
-            <header data-role="header"><h1>BART Map</h1></header>
-            <div class="content" data-role="content">
-                <p><img src="assets/img/system-map.gif"></p>
-            </div>
-            <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
-        </section>
-
-        <section id="pageDebug" data-role="page">
-            <header data-role="header"><h1>Debug Page</h1></header>
-            <div class="content" data-role="content">
-                <div id="geolocation">
-
-                </div>
-                <a href="#" id="" onclick="alarm()">Alarm</a>
-            </div>
-            <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
-        </section>
+        </div>
 
 
-	</body>
+        <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; overflow: hidden;text-align: center">
+            Projected Arrival Time <span id="arriveTime">?</span>
+            <br />
+            <span id="timeRemaining" style="font-size: 32px;">??:??</span>
+            <div id="progressbar"></div>
+        </div>
+
+        <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
+
+        <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
+            <h3>Debug Log</h3>
+            <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
+            <a href="#"  onclick="clearLog();">Clear</a>&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="findTripTime(stationDepartAbbr,stationArriveAbbr);">Trip Time</a>&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;
+            <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
+        </div>
+    </div>
+    <footer data-role="footer"><h1>MTS</h1></footer>
+</section>
+
+<section id="pageMap" data-role="page">
+    <header data-role="header"><h1>BART Map</h1></header>
+    <div class="content" data-role="content">
+        <p><img src="assets/img/system-map.gif"></p>
+    </div>
+    <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
+</section>
+
+<section id="pageDebug" data-role="page">
+    <header data-role="header"><h1>Debug Page</h1></header>
+    <div class="content" data-role="content">
+        <div id="geolocation">
+
+        </div>
+        <a href="#" id="" onclick="alarm()">Alarm</a>
+    </div>
+    <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
+</section>
+
+
+</body>
 </html>
