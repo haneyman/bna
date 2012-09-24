@@ -39,6 +39,8 @@ $(document).ready(function(){
 //                    value: 0
 //                });
     $('#departProgress').hide();
+    $('#debugLog').hide();
+
 
     $("[name=radio-alarm-state]").change(function() {
         isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
@@ -178,6 +180,7 @@ function addToTime(time, addSeconds) {
 function loadStopTimes() {
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     var csvfile = "gtfs/stop_times.txt";
+    //var csvfile = "gtfs/stop_times_test.txt";
     log("loading gtfs stoptimes...");
     $.ajax({
         url : csvfile,
@@ -273,20 +276,19 @@ function getTripTime(orig, dest) {
                     origSequence = stopTimeSequence;
                     currentTripId = stopTimeTripId;
                     departTime = stopTimeDepartTimeAsDate;
-                    //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + origTime);
+                    //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime);
                 }
             } else {
                 if (stopTimeTripId != currentTripId || parseInt(stopTimeSequence) < parseInt(origSequence)) {
-                    if (stopTimeSequence < origSequence)
-                    //new trip, look for orig again
-                        log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
+                    //if (stopTimeSequence < origSequence)
+                        //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
                     currentTripId = stopTimeTripId;
                     inRoute = false;
                 } else {
                     if (inRoute) {
                         if (stopTimeStopId == dest) {
-                            log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
+                            //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             inRoute = false;//keep looking for better times
                             //break;
                         }
@@ -604,7 +606,7 @@ function onWatchError(error) {
         <div  data-role="fieldcontain">
             <div style="float:left;width:350px">
                 <div style="float:left;margin-top: 7px;width: 100px;">
-                    <label for="select-depart" >Start</label>
+                    <label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>
                 </div>
                 <select id="select-depart" name="select-depart">
                 </select>
@@ -655,9 +657,9 @@ function onWatchError(error) {
         </div>
 
 
-        <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; overflow: hidden;text-align: center">
-            Projected Arrival Time <span id="arriveTime">?</span>
-            <br />
+        <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; text-align: center">
+            <!--Projected Arrival Time <span id="arriveTime">?</span>-->
+            <!--<br />-->
             <span id="timeRemaining" style="font-size: 32px;">??:??</span>
             <div id="progressbar"></div>
         </div>
