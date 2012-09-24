@@ -90,12 +90,14 @@ function newTrip() {
     alarmOff();
     stationDepartAbbr = $("#select-depart option:selected").val();
     stationArriveAbbr = $("#select-arrive option:selected").val();
+    $('#departTime').show();
+    $('.arriveTime').hide();
     if (stationDepartAbbr.length > 0 && stationArriveAbbr.length > 0) {
         $('#departProgress').show();
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr);
-        log("Stations changed in newTrip() from " + stationDepartAbbr + "(" + formatDateToTime(departTime) + ") to " + stationArriveAbbr + "(" + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes");
+        log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes");
+        $('#departProgress').hide();
         if (tripTime != null) {
-            $('#departProgress').hide();
             $('#departTime').html(formatDateToTime(departTime)).show();
             $('.arriveTime').html(formatDateToTime(arriveTime)).show();
         }
@@ -180,7 +182,7 @@ function addToTime(time, addSeconds) {
 function loadStopTimes() {
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     var csvfile = "gtfs/stop_times.txt";
-    //var csvfile = "gtfs/stop_times_test.txt";
+//    var csvfile = "gtfs/stop_times_test.txt";
     log("loading gtfs stoptimes...");
     $.ajax({
         url : csvfile,
@@ -240,6 +242,7 @@ function getTripTime(orig, dest) {
     var stopTimeSequence;
     var stopTimeStopId;
     var inRoute = false;
+    var inRouteDepartTime;
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartTimeAsDate = new Date();
@@ -266,28 +269,34 @@ function getTripTime(orig, dest) {
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
         //log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
-        if ((stopTimeTripId.indexOf("SUN") >= 0 && day == "SUN")
-                || (stopTimeTripId.indexOf("SAT") >= 0 && day == "SAT")
-                || (stopTimeTripId.indexOf("SAT") < 0 && !stopTimeTripId.indexOf("SUN") < 0)) {
+        //debugif (stopTimeTripId == "46SFO11" && stopTimeStopId == "EMBR")
+        //    alert('yup');
+        if ((stopTimeTripId.indexOf("SUN") >= 0 && day == "SUN")  //its sunday
+                || (stopTimeTripId.indexOf("SAT") >= 0 && day == "SAT") //its saturday
+                || (stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
             if (stopTimeStopId == orig) { //matching origin
                 if (stopTimeDepartTimeAsDate < now  //previous to current time
                         && stopTimeDepartTimeAsDate > departTime) {//more recent the current match
                     inRoute = true;
                     origSequence = stopTimeSequence;
                     currentTripId = stopTimeTripId;
-                    departTime = stopTimeDepartTimeAsDate;
+                    inRouteDepartTime = stopTimeDepartTimeAsDate;
                     //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime);
                 }
             } else {
                 if (stopTimeTripId != currentTripId || parseInt(stopTimeSequence) < parseInt(origSequence)) {
+                    //log("station rejected");
                     //if (stopTimeSequence < origSequence)
                         //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
                     currentTripId = stopTimeTripId;
                     inRoute = false;
                 } else {
+                    //log("station not rejected");
                     if (inRoute) {
+                        //log("in route");
                         if (stopTimeStopId == dest) {
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
+                            departTime = inRouteDepartTime;
                             //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             inRoute = false;//keep looking for better times
                             //break;
@@ -656,12 +665,22 @@ function onWatchError(error) {
             </div>
         </div>
 
+<!--
 
         <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; text-align: center">
-            <!--Projected Arrival Time <span id="arriveTime">?</span>-->
-            <!--<br />-->
+            &lt;!&ndash;Projected Arrival Time <span id="arriveTime">?</span>&ndash;&gt;
+            &lt;!&ndash;<br />&ndash;&gt;
             <span id="timeRemaining" style="font-size: 32px;">??:??</span>
             <div id="progressbar"></div>
+        </div>
+
+-->
+        <div id="alarmStatus" >
+            <!--Projected Arrival Time <span id="arriveTime">?</span>-->
+            <!--<br />-->
+            <a id="timeRemaining" href="#" data-role="button" data-icon="star" data-theme="e"></a>
+            <!--<span id="timeRemaining" style="font-size: 32px;">??:??</span>-->
+            <!--<div id="progressbar"></div>-->
         </div>
 
         <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
