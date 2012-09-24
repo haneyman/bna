@@ -276,15 +276,16 @@ function getTripTime(orig, dest) {
                     //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + origTime);
                 }
             } else {
-                if (stopTimeTripId != currentTripId){ // || stopTimeSequence < origSequence) {
+                if (stopTimeTripId != currentTripId || parseInt(stopTimeSequence) < parseInt(origSequence)) {
+                    if (stopTimeSequence < origSequence)
                     //new trip, look for orig again
-                    //log("dest rejected  " + stopTimeTripId + "  " + currentTripId + "  " + stopTimeSequence + "  " + origSequence)
+                        log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
                     currentTripId = stopTimeTripId;
                     inRoute = false;
                 } else {
                     if (inRoute) {
                         if (stopTimeStopId == dest) {
-                            //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime)
+                            log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
                             inRoute = false;//keep looking for better times
                             //break;
@@ -386,7 +387,6 @@ function alarmOff() {
 
 //formats a date into hh:mm:ss
 function formatDateToTime(date) {
-    log("Date:" + date)
     var ampm;
     if (date == null)
         return date;
@@ -609,12 +609,12 @@ function onWatchError(error) {
                 <select id="select-depart" name="select-depart">
                 </select>
             </div>
-            <div style="float:left;">
+            <div style="float:left; margin-top: 10px;">
                 <div id="departProgress" >Searching...</div>
                 <div style="font-size: 12px;" id="departTime" ></div>
             </div>
         </div>
-        <div  data-role="fieldcontain">
+        <div style="margin-top: 70px;margin-bottom: 20px;"  data-role="fieldcontain">
             <div style="float:left;width:350px">
                 <div style="float:left;margin-top: 7px;width: 100px;">
                     <label for="select-arrive" >End</label>
@@ -622,15 +622,15 @@ function onWatchError(error) {
                 <select id="select-arrive" name="select-arrive">
                 </select>
             </div>
-            <div style="float:left;">
+            <div style="float:left;margin-top: 10px;">
                 <div style="font-size: 12px;" class="arriveTime" ></div>
             </div>
         </div>
         <div style="clear:both;"></div>
         <!--<div style="float:right">Time</div>-->
-        <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
+        <fieldset id="alarmtype" style="margin-top: 20px;" data-role="controlgroup" data-type="horizontal">
             <div style="float:left;margin-top:10px;">Alarm Type</div>
-            <div style="float:left;margin-left:85px;">
+            <div style="float:left;margin-left:25px;">
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
                 <label for="radio-alarmtype-noise">Alarm</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
@@ -643,7 +643,7 @@ function onWatchError(error) {
 
         <div data-role="fieldcontain" style="">
             <div style="float:left;margin-top:10px;">ON / OFF</div>
-            <div style="margin-left:163px">
+            <div style="margin-left:103px">
                 <fieldset id="radio-alarm-state" data-role="controlgroup" data-type="horizontal">
                     <!--<legend>Alarm:</legend>-->
                     <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
@@ -670,7 +670,7 @@ function onWatchError(error) {
             <a href="#"  onclick="clearLog();">Clear</a>&nbsp;&nbsp;&nbsp;
             <a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;
             <a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;
-            <a href="#" onclick="findTripTime(stationDepartAbbr,stationArriveAbbr);">Trip Time</a>&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="getTripTime(stationDepartAbbr,stationArriveAbbr);">Trip Time</a>&nbsp;&nbsp;&nbsp;
             <a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;
             <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
         </div>
