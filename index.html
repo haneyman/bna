@@ -268,7 +268,7 @@ function getTripTime(orig, dest) {
         stopTimeDepartTimeAsDate = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        //log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
+        log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
         //debugif (stopTimeTripId == "46SFO11" && stopTimeStopId == "EMBR")
         //    alert('yup');
         if ((stopTimeTripId.indexOf("SUN") >= 0 && day == "SUN")  //its sunday
@@ -281,11 +281,11 @@ function getTripTime(orig, dest) {
                     origSequence = stopTimeSequence;
                     currentTripId = stopTimeTripId;
                     inRouteDepartTime = stopTimeDepartTimeAsDate;
-                    //log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime);
+                    log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime);
                 }
             } else {
                 if (stopTimeTripId != currentTripId || parseInt(stopTimeSequence) < parseInt(origSequence)) {
-                    //log("station rejected");
+                    log("   station rejected");
                     //if (stopTimeSequence < origSequence)
                         //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
                     currentTripId = stopTimeTripId;
@@ -297,7 +297,7 @@ function getTripTime(orig, dest) {
                         if (stopTimeStopId == dest) {
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
                             departTime = inRouteDepartTime;
-                            //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
+                            log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             inRoute = false;//keep looking for better times
                             //break;
                         }
