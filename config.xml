@@ -4,7 +4,7 @@
 	id		= "com.mts.bna"
 	version 	= "1.0.0">
 
-	<name>BNA</name>
+	<name>BartNapApp</name>
 
 	<description>
 		My BNA application from git at https://github.com/haneyman/bna.git
@@ -18,7 +18,7 @@
 
 	<icon src="icon.png" gap:role="default" ddd="" />
 
-	<feature name="http://api.phonegap.com/1.0/geolocation"/>
+	<!--<feature name="http://api.phonegap.com/1.0/geolocation"/>-->
 	<feature name="http://api.phonegap.com/1.0/network"/>
 	<feature name="http://api.phonegap.com/1.0/notification"/>
 	<feature name="http://api.phonegap.com/1.0/statusBarNotification"/>
@@ -27,7 +27,6 @@
     <!--<feature name="http://api.phonegap.com/1.0/contacts"/>-->
     <!--<feature name="http://api.phonegap.com/1.0/file"/>-->
     <feature name="http://api.phonegap.com/1.0/media"/>
-    <feature name="http://api.phonegap.com/1.0/notification"/>
 	<preference name="orientation" value="portrait" />
     <access origin="*" />
 
