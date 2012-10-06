@@ -33,13 +33,18 @@ var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
 var arrayStopTimes = [];
 var arrayStations  = [];
 var timeout;//holds setTimeout
+//
+var isDebug = true;
+var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
+//
 
 $(document).ready(function(){
 //                $( "#progressbar" ).progressbar({
 //                    value: 0
 //                });
+    log("Docready starting...")
     $('#departProgress').hide();
-    //$('#debugLog').hide();
+    $('#debugLog').hide();
 
 
     $("[name=radio-alarm-state]").change(function() {
@@ -76,6 +81,7 @@ $(document).ready(function(){
     $("#select-depart option:selected").val("");//TODO:not working, says "North Concord"
     $("#select-arrive option:selected").val("");
     alarmOff();
+    log("Docready complete")
 });
 
 
@@ -108,7 +114,12 @@ function newTrip() {
 
 
 function log(msg) {
-    $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+    if (isDebug) {
+        if ($('#log').is(':visible') )
+            $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
+        else
+            console.log(getCurrentTime() + " - " + msg);
+    }
 }
 
 function clearLog(msg) {
@@ -181,11 +192,10 @@ function addToTime(time, addSeconds) {
 //loads a massive file of times by sched, origin, dest
 function loadStopTimes() {
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
-    var csvfile = "gtfs/stop_times.txt";
 //    var csvfile = "gtfs/stop_times_test.txt";
     log("loading gtfs stoptimes...");
     $.ajax({
-        url : csvfile,
+        url : stopTimesFilenameURL,
         dataType : "text",
         success : function (data) {
             arrayStopTimes = jQuery.csv()(data);
@@ -227,6 +237,8 @@ function loadStations() {
 
 //looks in arrayStopTimes to find orig and dest and returns time
 function getTripTime(orig, dest) {
+    log("getTripTime staring...");
+
     if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
         return;
     log("finding trip time for orig:" + orig + "   dest:" + dest);
@@ -268,7 +280,7 @@ function getTripTime(orig, dest) {
         stopTimeDepartTimeAsDate = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        //log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
+        log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence);
         //debugif (stopTimeTripId == "46SFO11" && stopTimeStopId == "EMBR")
         //    alert('yup');
         if ((stopTimeTripId.indexOf("SUN") >= 0 && day == "SUN")  //its sunday
@@ -291,13 +303,13 @@ function getTripTime(orig, dest) {
                     currentTripId = stopTimeTripId;
                     inRoute = false;
                 } else {
-                    //log("station not rejected");
+                    log("station not rejected");
                     if (inRoute) {
-                        //log("in route");
+                        log("in route");
                         if (stopTimeStopId == dest) {
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
                             departTime = inRouteDepartTime;
-                            //log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
+                            log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId)
                             inRoute = false;//keep looking for better times
                             //break;
                         }
