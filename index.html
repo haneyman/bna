@@ -28,7 +28,8 @@
     var timeout;//holds setTimeout
     //
     var isDebug = true;
-    var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
+    var stopTimesFilenameURL = "gtfs/stop_times.txt";
+    //var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
     //
 
     $(document).ready(function(){
@@ -67,7 +68,7 @@
         });
 
         //initializations
-        $('#debugLog').trigger( "expand" );
+        //$('#debugLog').trigger( "expand" );
         //switchAlarm(false);
         loadStations();
         loadStopTimes();
@@ -230,7 +231,7 @@
 
     //looks in arrayStopTimes to find orig and dest and returns time
     function getTripTime(orig, dest) {
-        log("getTripTime staring...");
+        log("getTripTime starting...");
 
         if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
             return;
@@ -320,6 +321,7 @@
             alert("ERROR - Could not find a trip in the BART schedule.");
             return null;
         }
+        log("getTripTime done.");
     }
 
 
