@@ -615,53 +615,52 @@
 <section id="page1" data-role="page" data-fullscreen="true">
     <header data-role="header" ZZdata-position="fixed"><h1>BART Nap App</h1></header>
     <div class="content" data-role="content">
-        <p></p>
         <div style="float:right">
             <a href="#pageMap"  data-rel="dialog">BART Map</a>
         </div>
-        <div  data-role="fieldcontain">
-            <div style="float:left;width:350px">
-                <div style="float:left;margin-top: 7px;width: 100px;">
-                    <label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>
+        <div style="margin-top: 20px;">
+            <div  style="height: 10px;" ondblclick="$('#debugLog').show();">
+                <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
+                <div style="float:left;height: 10px">Start</div>
+                <div style="float:left;height: 10px;margin-left:130px;">
+                    <span id="departProgress" >Searching...</span>
+                    <span style="font-size: 12px;" id="departTime" ></span>
                 </div>
+            </div>
+
+            <div  style="" data-role="fieldcontain">
                 <select id="select-depart" name="select-depart">
                 </select>
             </div>
-            <div style="float:left; margin-top: 10px;">
-                <div id="departProgress" >Searching...</div>
-                <div style="font-size: 12px;" id="departTime" ></div>
-            </div>
         </div>
-        <div style="margin-top: 70px;margin-bottom: 20px;"  data-role="fieldcontain">
-            <div style="float:left;width:350px">
-                <div style="float:left;margin-top: 7px;width: 100px;">
-                    <label for="select-arrive" >End</label>
-                </div>
+        <div style="">
+            <div style="height: 10px;">
+                <label for="select-arrive" >End</label>
+            </div>
+            <div style="" data-role="fieldcontain">
                 <select id="select-arrive" name="select-arrive">
                 </select>
             </div>
-            <div style="float:left;margin-top: 10px;">
-                <div style="font-size: 12px;" class="arriveTime" ></div>
+            <div style="float:left;height: 10px;margin-left:130px;">
+                <span class="arriveTime" style="font-size: 12px;"></span>
             </div>
         </div>
-        <div style="clear:both;"></div>
-        <!--<div style="float:right">Time</div>-->
-        <fieldset id="alarmtype" style="margin-top: 20px;" data-role="controlgroup" data-type="horizontal">
-            <div style="float:left;margin-top:10px;">Alarm Type</div>
-            <div style="float:left;margin-left:25px;">
-                <input type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
+        <fieldset id="alarmtype" style="width:290px;" data-role="controlgroup" data-type="horizontal">
+            <!--<div style="">Alarm Type</div>-->
+            <!--<div>-->
+                <input  style="" type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
                 <label for="radio-alarmtype-noise">Alarm</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
                 <label for="radio-alarmtype-vibrate">Vibrate</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
-                <label for="radio-alarmtype-both">Alarm/Vibrate</label>
-            </div>
+                <label for="radio-alarmtype-both">Both</label>
+            <!--</div>-->
         </fieldset>
 
 
         <div data-role="fieldcontain" style="">
-            <div style="float:left;margin-top:10px;">ON / OFF</div>
-            <div style="margin-left:103px">
+            <!--<div style="float:left;margin-top:10px;">ON / OFF</div>-->
+            <div style="">
                 <fieldset id="radio-alarm-state" data-role="controlgroup" data-type="horizontal">
                     <!--<legend>Alarm:</legend>-->
                     <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
