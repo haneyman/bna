@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
-<title>BNA</title>
+<title>BartNapApp</title>
 <!--<link rel="stylesheet" href="assets/css/master.css" type="text/css" media="screen" />-->
 <link rel="stylesheet" href="assets/css/jquery.mobile-1.1.1.min.css" type="text/css" media="screen" />
-
 <script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
@@ -354,16 +353,6 @@
         return true;
     }
 
-    function getGeo() {
-        //log("calling geolocation.getCurrentPosition...");
-        //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
-        //log("geolocation.getCurrentPosition complete.");
-        //
-        // Options: throw an error if no update is received every 30 seconds.
-        //
-        //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
-    }
-
     function alarmOn() {
         if (alarmable()) {
             log("alarm ON");
@@ -454,119 +443,21 @@
 
 
 
-    //*********** BART API ***************************************************************
-    /*
-     function callBartApi(url) {
-     log("callBartApi starting... " + url)
-     var result = null;
-     $.ajax({
-     url: url,
-     type: 'get',
-     dataType: 'xml',
-     async: false,
-     success: function(data) {
-     log("callBartApi success!");
-     bartApiResult = data;
-     },
-     error: function(jqXHR, textStatus, errorThrown) {
-     log("callBartApi error:" + textStatus + "  " + jqXHR + " " + errorThrown);
-     }
-     });
-     };
-
-     //    <name>12th St. Oakland City Center</name><abbr>12TH</abbr><gtfs_latitude>37.803664</gtfs_latitude><gtfs_longitude>-122.271604</gtfs_longitude><address>1245 Broadway</address><city>Oakland</city><county>alameda</county><state>CA</state><zipcode>94612</zipcode>
-     function getBartStationsApi() {
-     //http://api.bart.gov/docs/overview/index.aspx
-     //http://www.bart.gov/schedules/developers/index.aspx
-     //key UBHV-T2TG-U2UQ-2VA5
-     // arrivals http://www.bart.gov/dev/eta/bart_eta.xml //
-     var abbr = "?";
-     var name = "?";
-     var options = "";
-     callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stns" + BART_API_KEY );
-     $(bartApiResult).find('station').each(function(){
-     abbr = "?";
-     name = "?";
-     $(this).find('name').each(function(){
-     name = $(this).text();
-     });
-     $(this).find('abbr').each(function(){
-     abbr = $(this).text();
-     });
-     //save to cache??????
-     options += '<option value="' + abbr + '">' + name + '</option>';
-     });
-     $('#select-depart').html(options);
-     $('#select-arrive').html(options);
-     }
-     //
-     function getStationSchedule(origStation) {
-     var abbr = "?";
-     var name = "?";
-     var options = "";
-     callBartApi("http://api.bart.gov/api/sched.aspx?cmd=stnsched&orig=" + origStation + BART_API_KEY );
-     $(bartApiResult).find('item').each(function(){
-     //line, trainHeadStation, origTime, destTime, trainIdx
-
-     $(this).find('trainHeadStation').each(function(){
-     trainHeadStation = $(this).text();
-     });
-     $(this).find('origTime').each(function(){
-     origTime = $(this).text();
-     });
-     $(this).find('origTime').each(function(){
-     destTime = $(this).text();
-     });
-     //save to cache??????
-     options += '<option value="' + abbr + '">' + name + '</option>';
-     });
-     $('#select-depart').html(options);
-     $('#select-arrive').html(options);
-     }
-
-     //
-     function getBartRoutes() {
-     var scheduleNumber = "?";
-     var name = "?";
-     var options = "";
-     callBartApi("http://api.bart.gov/api/route.aspx?cmd=routes&date=now" + BART_API_KEY );
-     //route -
-     $(bartApiResult).find('sched_num').each(function(){
-     scheduleNumber = $(this).text();
-     });
-
-
-
-     }
-
-     // gets a list of routes for a station
-     function getBartStationDetail(station) {
-     var routes = new Array();
-     callBartApi("http://api.bart.gov/api/stn.aspx?cmd=stninfo&orig=" + station + BART_API_KEY );
-     $(bartApiResult).find('station').each(function(){
-     //each station has multiple routes - name, abbr, routeID, number, color
-     $(bartApiResult).find('route').each(function(){
-     routes.push($(this).text());
-     });
-     });
-     }
-
-     // get route info - name, abbr, routID, number, origin, destination, direction, color, holidays, num_stns, config (list of stations)
-     function getBartRoute(routeNum) {
-     //var routes = new Array();
-     callBartApi("http://api.bart.gov/api/route.aspx?cmd=routeinfo&route=" + routeNum + BART_API_KEY );
-     $(bartApiResult).find('station').each(function(){
-     //each station has multiple routes - name, abbr, routeID, number, color
-     $(bartApiResult).find('route').each(function(){
-     routes.push($(this).text());
-     });
-     });
-     }
-     */
 
     //********** GPS STUFF *****************************************************************
     // onSuccess Geolocation
     //
+    function getGeo() {
+        //log("calling geolocation.getCurrentPosition...");
+        //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
+        //log("geolocation.getCurrentPosition complete.");
+        //
+        // Options: throw an error if no update is received every 30 seconds.
+        //
+        //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
+    }
+
+
     //function onGeoSuccess(position) {
     //    var element = document.getElementById('geolocation');
     //    element.innerHTML = 'Latitude: ' + position.coords.latitude            + '<br />' +
@@ -619,7 +510,7 @@
             <a href="#pageMap"  data-rel="dialog">BART Map</a>
         </div>
         <div style="margin-top: 20px;">
-            <div  style="height: 10px;" ondblclick="$('#debugLog').show();">
+            <div  style="height: 10px;" ondblclick="$('#debugLog').toggle();">
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
                 <div style="float:left;height: 10px">Start</div>
                 <div style="float:left;height: 10px;margin-left:130px;">
@@ -634,15 +525,15 @@
             </div>
         </div>
         <div style="">
-            <div style="height: 10px;">
-                <label for="select-arrive" >End</label>
+            <div  style="height: 10px;">
+                <div style="float:left;height: 10px">End</div>
+                <div style="float:left;height: 10px;margin-left:130px;">
+                    <span class="arriveTime" style="font-size: 12px;"></span>
+                </div>
             </div>
             <div style="" data-role="fieldcontain">
                 <select id="select-arrive" name="select-arrive">
                 </select>
-            </div>
-            <div style="float:left;height: 10px;margin-left:130px;">
-                <span class="arriveTime" style="font-size: 12px;"></span>
             </div>
         </div>
         <fieldset id="alarmtype" style="width:290px;" data-role="controlgroup" data-type="horizontal">
