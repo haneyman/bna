@@ -509,13 +509,13 @@
         <div style="float:right">
             <a href="#pageMap"  data-rel="dialog">BART Map</a>
         </div>
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 20px; width:320px;">
             <div  style="height: 10px;" ondblclick="$('#debugLog').toggle();">
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
                 <div style="float:left;height: 10px">Start</div>
-                <div style="float:left;height: 10px;margin-left:130px;">
+                <div style="float:right;height: 10px;font-size: 12px;color: #8b4513;">
                     <span id="departProgress" >Searching...</span>
-                    <span style="font-size: 12px;" id="departTime" ></span>
+                    <span style="font-size: 12px;color: #8a2be2;" id="departTime" ></span>
                 </div>
             </div>
 
@@ -527,8 +527,8 @@
         <div style="">
             <div  style="height: 10px;">
                 <div style="float:left;height: 10px">End</div>
-                <div style="float:left;height: 10px;margin-left:130px;">
-                    <span class="arriveTime" style="font-size: 12px;"></span>
+                <div style="float:right;height: 10px;">
+                    <span class="arriveTime" style="font-size: 12px;color: #8b4513;"></span>
                 </div>
             </div>
             <div style="" data-role="fieldcontain">
@@ -536,30 +536,28 @@
                 </select>
             </div>
         </div>
-        <fieldset id="alarmtype" style="width:290px;" data-role="controlgroup" data-type="horizontal">
+        <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
             <!--<div style="">Alarm Type</div>-->
             <!--<div>-->
                 <input  style="" type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
-                <label for="radio-alarmtype-noise">Alarm</label>
+                <label for="radio-alarmtype-noise" style="width:95px;">Alarm</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
-                <label for="radio-alarmtype-vibrate">Vibrate</label>
+                <label for="radio-alarmtype-vibrate" style="width:95px;">Vibrate</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
-                <label for="radio-alarmtype-both">Both</label>
+                <label for="radio-alarmtype-both" style="width:95px;">Both</label>
             <!--</div>-->
         </fieldset>
 
 
         <div data-role="fieldcontain" style="">
             <!--<div style="float:left;margin-top:10px;">ON / OFF</div>-->
-            <div style="">
-                <fieldset id="radio-alarm-state" data-role="controlgroup" data-type="horizontal">
-                    <!--<legend>Alarm:</legend>-->
-                    <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
-                    <label for="radio-alarm-on"  style="color:green">Alarm ON</label>
-                    <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
-                    <label for="radio-alarm-off" style="color:red">Alarm OFF</label>
-                </fieldset>
-            </div>
+            <fieldset id="radio-alarm-state" data-role="controlgroup" data-type="horizontal">
+                <!--<legend>Alarm:</legend>-->
+                <input type="radio" name="radio-alarm-state" id="radio-alarm-on">
+                <label for="radio-alarm-on"  style="color:green;width:142px;">Alarm ON</label>
+                <input type="radio" name="radio-alarm-state" id="radio-alarm-off" checked="checked">
+                <label for="radio-alarm-off" style="color:red;width:142px;">Alarm OFF</label>
+            </fieldset>
         </div>
 
 <!--
@@ -572,12 +570,8 @@
         </div>
 
 -->
-        <div id="alarmStatus" >
-            <!--Projected Arrival Time <span id="arriveTime">?</span>-->
-            <!--<br />-->
+        <div id="alarmStatus" style="height: 100px;">
             <a id="timeRemaining" href="#" data-role="button" data-icon="star" data-theme="e"></a>
-            <!--<span id="timeRemaining" style="font-size: 32px;">??:??</span>-->
-            <!--<div id="progressbar"></div>-->
         </div>
 
         <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
@@ -593,7 +587,7 @@
             <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
         </div>
     </div>
-    <footer data-role="footer"><h1>MTS</h1></footer>
+    <!--<footer data-role="footer"><h1>MTS</h1></footer>-->
 </section>
 
 <section id="pageMap" data-role="page">
@@ -608,14 +602,14 @@
     <header data-role="header"><h1>Debug Page</h1></header>
     <div class="content" data-role="content">
         <div id="geolocation">
-
         </div>
         <a href="#" id="" onclick="alarm()">Alarm</a>
     </div>
-    <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
+    <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
 
-<script type="text/javascript" src="http://debug.phonegap.com/target/target-script-min.js#69d930ba-da73-11e1-9ed2-1231391c98a7"></script>
+<!--Uncomment below to send debug to Phonegap Build site-->
+<!--<script type="text/javascript" src="http://debug.phonegap.com/target/target-script-min.js#69d930ba-da73-11e1-9ed2-1231391c98a7"></script>-->
 </body>
 
 </html>
