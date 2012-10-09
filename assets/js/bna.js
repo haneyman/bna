@@ -17,8 +17,8 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = true;
-var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
+var isDebug = false;
+var debugLevel = 2;//0-detailed, 1-less detailed, 2-summary level
 var stopTimesFilenameURL = "/bna/gtfs/stop_times.txt";
 var stationsURL = "/bna/gtfs/stops.txt";
 //var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
@@ -27,8 +27,9 @@ var stationsURL = "/bna/gtfs/stops.txt";
 function initialize() {
     loadStations();
     loadStopTimes();
-    $("#select-depart option:selected").val("");//TODO:not working, says "North Concord"
+    $("#select-depart option:selected").val("");
     $("#select-arrive option:selected").val("");
+    $("#buttonStartTime").hide();
     alarmOff();
     log("Initialized.  Debug is " + isDebug + "  with level of " + debugLevel, 2 );
 }
@@ -43,16 +44,19 @@ function newTrip() {
     alarmOff();
     stationDepartAbbr = $("#select-depart option:selected").val();
     stationArriveAbbr = $("#select-arrive option:selected").val();
-    $('#departTime').show();
+    $("#departTime").html("");
+    $("#buttonStartTime").show();
     $('.arriveTime').hide();
     if (stationDepartAbbr.length > 0 && stationArriveAbbr.length > 0) {
-        $('#departProgress').show();
+        $('#departTime').html("Searching...");
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr, currentdayOfWeek, getCurrentTimeHHMMSS());
         log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes",1);
-        $('#departProgress').hide();
+        $('#departTime').html("?");
         if (tripTime != null) {
             $('#departTime').html(formatDateToTime(departTime)).show();
             $('.arriveTime').html(formatDateToTime(arriveTime)).show();
+        } else {
+            $('#departTime').html("Error");
         }
     }
 }
@@ -66,7 +70,8 @@ function log(msg, level) {
             if ($('#log').is(':visible') )
                 $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
             else
-                console.log(getCurrentTime() + " - " + msg);
+                if( (window['console'] !== undefined) )
+                    console.log(getCurrentTime() + " - " + msg);
         }
     }
 }
@@ -187,7 +192,10 @@ function updateAlarmDisplay() {
     var diff = (arriveTime.getTime() - new Date().getTime()) ;
 
     $('#timeRemaining').html(formatMilliseconds(diff));
-    $('#progressbar').val(diff / tripTime);
+    //$('#progressbar').val(diff / tripTime);
+    $('#imagePulse').fadeIn('slow', function() {
+        $('#imagePulse').fadeOut('slow');
+    });
     if (diff < MINUTES_BEFORE_ARRIVAL * 1000 * 60) {
         //if (diff < 0)
         //    $('#timeRemaining').html("ARRIVED");
@@ -359,7 +367,7 @@ function loadStations() {
     var abbr = "?";
     var name = "?";
     var options = "";
-    log("loading gtfs stations...",2);
+    log("loading gtfs stations from " + stationsURL + "...",2);
     $.ajax({
         url : stationsURL,
         dataType : "text",
@@ -387,7 +395,8 @@ function loadStations() {
 
 //looks in arrayStopTimes to find orig and dest and returns time
 function getTripTime(orig, dest, dayOfWeek, time ) {
-    log("finding trip time for orig:" + orig + "   dest:" + dest + " day" + dayOfWeek + "  time: " + time,2);
+    log("finding trip time for orig: " + orig + "   dest: " + dest + " day: "
+        + dayOfWeek + "  time: " + time,2);
     if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
         return;
     departTime = null;
@@ -413,7 +422,6 @@ function getTripTime(orig, dest, dayOfWeek, time ) {
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
     var timeString = "";
-    log("current time is " + time + "  and the day is " + dayOfWeek,1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
@@ -421,13 +429,13 @@ function getTripTime(orig, dest, dayOfWeek, time ) {
         if (stopTimeDepartTime.length == 7)
             stopTimeDepartTime = "0" + stopTimeDepartTime;//javascript requires hh format or craps out
         timeString = now.getFullYear() + "-" + mm + "-" + dd + "T" + stopTimeDepartTime;
-        stopTimeDepartTimeAsDate = new Date(Date.parse(timeString));
+        stopTimeDepartTimeAsDate = new Date(Date.parse(timeString)); //wrong date but not important, only need time
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
         log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
         if ((stopTimeTripId.indexOf("SUN") >= 0 && dayOfWeek == "SUN")  //its sunday
             || (stopTimeTripId.indexOf("SAT") >= 0 && dayOfWeek == "SAT") //its saturday
-            || (stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
+            || (dayOfWeek != "SAT" && dayOfWeek != "SUN" && stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
             if (stopTimeStopId == orig) { //matching origin
                 if (stopTimeDepartTimeAsDate < now  //previous to current time
                     && stopTimeDepartTimeAsDate > departTime) {//more recent the current match
@@ -451,7 +459,8 @@ function getTripTime(orig, dest, dayOfWeek, time ) {
                         if (stopTimeStopId == dest) {
                             arriveTime = stopTimeDepartTimeAsDate;//remember the Date
                             departTime = inRouteDepartTime;
-                            log("   Trip found starting at " + departTime + "   arriving at " + arriveTime + "   trip_id: " + stopTimeTripId,1);
+                            log("     Potential trip found: " + formatDateToTime(departTime) + " - "
+                                + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
                             inRoute = false;//keep looking for better times
                             //break;
                         }
@@ -461,13 +470,14 @@ function getTripTime(orig, dest, dayOfWeek, time ) {
         } //else
     }
     if (arriveTime != null && departTime != null) {
-        log("  Returning trip found starting at " + departTime + "   arriving at " + arriveTime,1);
-        log("getTripTime done.",2);
-        return (arriveTime - departTime)/1000;//in seconds
+        var tripTime = (arriveTime - departTime)/1000;
+        log("  Returning trip found: " + tripTime + "sec (" + tripTime/60 + "min) " + formatDateToTime(departTime) + " - " + formatDateToTime(arriveTime),2);
+        log("getTripTime done.",1);
+        return tripTime;//in seconds
         //                    return (timeDiff(origTime, destTime))
     } else {
         log("ERROR - No trip found.",2);
-        log("getTripTime done.",2);
+        log("getTripTime done.",1);
         alert("ERROR - Could not find a trip in the BART schedule.");
         return null;
     }

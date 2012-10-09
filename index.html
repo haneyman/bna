@@ -1,11 +1,12 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
 <title>BartNapApp</title>
 <!--<link rel="stylesheet" href="assets/css/master.css" type="text/css" media="screen" />-->
 <link rel="stylesheet" href="assets/css/jquery.mobile-1.1.1.min.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="assets/css/bna.css" type="text/css" media="screen" />
 <script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
@@ -14,7 +15,6 @@
 <script type="text/javascript">
     $(document).ready(function(){
         log("Docready starting...",1);
-        $('#departProgress').hide();
         $('#debugLog').hide();
 
 
@@ -51,22 +51,28 @@
 
         log("Docready complete",1)
     });
+
+    function testGetTrip() {
+        $("#select-depart option:selected").val("CONC");
+        $("#select-arrive option:selected").val("EMBR");
+        //alert('yeah?');
+    }
 </script>
 </head>
 <body>
-<section id="page1" data-role="page" data-fullscreen="true">
-    <header data-role="header" ZZdata-position="fixed"><h1>BART Nap App</h1></header>
-    <div class="content" data-role="content">
-        <div style="float:right">
-            <a href="#pageMap"  data-rel="dialog">BART Map</a>
+<section id="pageHome" data-role="page" data-fullscreen="true" data-theme="a">
+    <header data-role="header" data-id="header"  data-theme="d">
+        <div style="text-align:center">
+            <img src="/bna/assets/img/logoTrans.png" height="50px;">
         </div>
-        <div style="margin-top: 20px; width:320px;">
+    </header>
+    <div class="content" data-role="content" style="margin-left: 5px;width:300px;">
+        <div style="margin-top: 15px;">
             <div  style="height: 10px;" ondblclick="$('#debugLog').toggle();">
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
-                <div style="float:left;height: 10px">Start</div>
-                <div style="float:right;height: 10px;font-size: 12px;color: #8b4513;">
-                    <span id="departProgress" >Searching...</span>
-                    <span style="font-size: 12px;color: #8a2be2;" id="departTime" ></span>
+                <div style="float:left;height: 10px;margin-top: 9px;">Start</div>
+                <div style="float:right;margin-bottom: 13px;height: 10px;font-size: 8px;">
+                    <a id="buttonStartTime" href="#pageStartTimes" data-role="button" data-mini="true"><span style="color: #F2C43d;" id="departTime">????</span></a>
                 </div>
             </div>
 
@@ -77,9 +83,11 @@
         </div>
         <div style="">
             <div  style="height: 10px;">
-                <div style="float:left;height: 10px">End</div>
+                <div style="float:left;height: 10px;margin-top:5px;margin-bottom: 2px"  ondblclick="testGetTrip();">
+                    End
+                </div>
                 <div style="float:right;height: 10px;">
-                    <span class="arriveTime" style="font-size: 12px;color: #8b4513;"></span>
+                    <span class="arriveTime" style="font-size: 12px;color: #F2C43d;"></span>
                 </div>
             </div>
             <div style="" data-role="fieldcontain">
@@ -121,11 +129,30 @@
         </div>
 
 -->
-        <div id="alarmStatus" style="height: 100px;">
+<!--
+        <div id="alarmStatus" style="height: 200px;">
             <a id="timeRemaining" href="#" data-role="button" data-icon="star" data-theme="e"></a>
+        </div>
+-->
+
+        <div id="alarmStatus" style="">
+            <!--<a data-corners="true" data-shadow="true" data-wrapperels="span" class="ui-shadow ui-btn-corner-all">29 min </a>-->
+            <div class="ui-bar ui-bar-e" style="ZZheight: 100px;">
+                <div  style="font-size: 24px;font-weight: 800;text-align: center;display:inline-block; width:92%; margin-top:5px;">
+                    <span id="timeRemaining"></span>
+                    <img id="imagePulse" src="/bna/assets/img/circle3.png" height="15px;">
+                </div>
+                <!--<div style="float:right;margin-right: 50px;">-->
+
+                <!--</div>-->
+            </div>
         </div>
 
         <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
+
+        <!--<div style="float:right">-->
+            <!--<a href="#pageMap"  data-rel="dialog">BART Map</a>-->
+        <!--</div>-->
 
         <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
             <h3>Debug Log</h3>
@@ -139,15 +166,23 @@
             <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
         </div>
     </div>
-    <!--<footer data-role="footer"><h1>MTS</h1></footer>-->
+    <footer data-role="footer" data-id="footer"  data-position="fixed" style="height:35px;padding: 5px;">
+        <a href="http://www.mtsconsulting.biz/bna/aboutLink"><span style="font-size: 10px;color: #b0c4de;font-style: italic;">by MTS</span></a>
+        <div style="float:right;margin-right: 10px;">
+            <a href="#pageMap"  ZZdata-rel="dialog" data-role="button">BART Map</a>
+        </div>
+    </footer>
 </section>
 
 <section id="pageMap" data-role="page">
-    <header data-role="header"><h1>BART Map</h1></header>
+    <header data-role="header">
+        <a href="#pageHome" data-icon="arrow-l">Back</a>
+        <h1>BART Map</h1>
+    </header>
     <div class="content" data-role="content">
         <p><img src="assets/img/system-map.gif"></p>
     </div>
-    <footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>
+    <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
 
 <section id="pageDebug" data-role="page">
@@ -156,6 +191,32 @@
         <div id="geolocation">
         </div>
         <a href="#" id="" onclick="alarm()">Alarm</a>
+    </div>
+    <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
+</section>
+
+<section id="pageStartTimes" data-role="page"  data-theme="b">
+    <header data-role="header"  data-theme="b" style="">
+        <a href="#pageHome" data-icon="arrow-l">Back</a>
+        <h1>Departures</h1>
+    </header>
+    <div class="content" data-role="content">
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                <legend>Select which train you are on:</legend>
+                <input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />
+                <label for="radio-startTime-1">Start Time 1</label>
+
+                <input type="radio" name="radio-startTime" id="radio-startTime-2" value="choice-2"  />
+                <label for="radio-startTime-2">Dog</label>
+
+                <input type="radio" name="radio-startTime" id="radio-startTime-3" value="choice-3"  />
+                <label for="radio-startTime-3">Hamster</label>
+
+                <input type="radio" name="radio-startTime" id="radio-startTime-4" value="choice-4"  />
+                <label for="radio-startTime-4">Lizard</label>
+            </fieldset>
+        </div>
     </div>
     <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>

@@ -8,7 +8,6 @@
     <script src="../assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <!--<script src="../assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>-->
     <script src="../assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
-    //
     <script src="../assets/js/bna.js"></script>
     <script src="qunit.js"></script>
     <!--<script src="tests.js"></script>-->
@@ -49,19 +48,43 @@
             testGetTripTime("CONC","EMBR","MON","8:00:00", 2580)
         });
 
+        test('Get Trip Times - Conc to Embr 23:00', function() {
+            testGetTripTime("CONC","EMBR","MON","23:00:00", 2580)
+        });
+
         test('Get Trip Times = Embr to Conc 8:00', function() {
             testGetTripTime("EMBR","CONC","MON","8:00:00", 2460)
         });
 
         test('Get Trip Times = Embr to Conc 11:00 SAT', function() {
-            testGetTripTime("EMBR","CONC","SAT","11:00:00", 2460)
+            testGetTripTime("EMBR","CONC","SAT","11:00:00", 2520)
         });
 
         test('Get Trip Times = Embr to Conc 11:00 SUN', function() {
-            testGetTripTime("EMBR","CONC","SUN","11:00:00", 2460)
+            testGetTripTime("EMBR","CONC","SUN","11:00:00", 2520)
         });
 
-        function testGetTripTime(origin, dest, curtime, dayOfWeek, expectedTime) {
+        test('Get Trip Times = Embr to Conc 23:00 SAT', function() {
+            testGetTripTime("EMBR","CONC","SAT","23:00:00", 2520)
+        });
+
+        test('Get Trip Times = Embr to Conc 23:00 SUN', function() {
+            testGetTripTime("EMBR","CONC","SUN","23:00:00", 2520)
+        });
+
+//        test("basics", function() {
+//            var values = {
+//                name: "World"
+//            };
+//            equal( format("Hello, {name}", values), "Hello, World", "single use" );
+//            equal( format("Hello, {name}, how is {name} today?", values),
+//                    "Hello, World, how is World today?", "multiple" );
+//        });
+
+
+        function testGetTripTime(origin, dest, dayOfWeek, curtime, expectedTime) {
+            if (arrayStopTimes.length == 0)
+                loadStopTimes();
             var time = getTripTime(origin, dest, dayOfWeek, curtime);
 
             equal(time, expectedTime, 'Correct time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest + ' day: ' + dayOfWeek + ' time: ' + curtime);
@@ -78,5 +101,6 @@
     <div id="qunit-testrunner-toolbar"></div>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture">test markup</div>
 </body>
 </html>
