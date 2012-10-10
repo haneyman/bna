@@ -11,6 +11,7 @@
 <script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
+<script src="assets/js/jquery.cookie.js"></script>
 <script src="assets/js/bna.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     $(document).ready(function(){
@@ -96,6 +97,9 @@
                 </select>
             </div>
         </div>
+
+        <!--<button onclick="newTrip();">Get Time</button>-->
+
         <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
             <!--<div style="">Alarm Type</div>-->
             <!--<div>-->
@@ -120,22 +124,6 @@
             </fieldset>
         </div>
 
-<!--
-
-        <div id="alarmStatus" style="border: solid #828282; border-radius: 15px; text-align: center">
-            &lt;!&ndash;Projected Arrival Time <span id="arriveTime">?</span>&ndash;&gt;
-            &lt;!&ndash;<br />&ndash;&gt;
-            <span id="timeRemaining" style="font-size: 32px;">??:??</span>
-            <div id="progressbar"></div>
-        </div>
-
--->
-<!--
-        <div id="alarmStatus" style="height: 200px;">
-            <a id="timeRemaining" href="#" data-role="button" data-icon="star" data-theme="e"></a>
-        </div>
--->
-
         <div id="alarmStatus" style="">
             <!--<a data-corners="true" data-shadow="true" data-wrapperels="span" class="ui-shadow ui-btn-corner-all">29 min </a>-->
             <div class="ui-bar ui-bar-e" style="">
@@ -147,12 +135,6 @@
                 </div>
             </div>
         </div>
-
-        <!--<button value="zzzz" style="height: 160px;">Projected Arrival Time<br/>4:34 </button>-->
-
-        <!--<div style="float:right">-->
-            <!--<a href="#pageMap"  data-rel="dialog">BART Map</a>-->
-        <!--</div>-->
 
         <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
             <h3>Debug Log</h3>

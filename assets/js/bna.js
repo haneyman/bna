@@ -31,6 +31,7 @@ function initialize() {
     $("#select-arrive option:selected").val("");
     $("#buttonStartTime").hide();
     alarmOff();
+    loadPreferences();
     log("Initialized.  Debug is " + isDebug + "  with level of " + debugLevel, 2 );
 }
 
@@ -44,6 +45,7 @@ function newTrip() {
     alarmOff();
     stationDepartAbbr = $("#select-depart option:selected").val();
     stationArriveAbbr = $("#select-arrive option:selected").val();
+    savePreferences();
     $("#departTime").html("");
     $("#buttonStartTime").hide();
     $('.arriveTime').hide();
@@ -286,61 +288,28 @@ function playStream(url) {
 
 //******** END - audio
 
-
-
-//********** GPS STUFF *****************************************************************
-// onSuccess Geolocation
-//
-function getGeo() {
-    //log("calling geolocation.getCurrentPosition...");
-    //navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
-    //log("geolocation.getCurrentPosition complete.");
-    //
-    // Options: throw an error if no update is received every 30 seconds.
-    //
-    //var watchID = navigator.geolocation.watchPosition(onWatchSuccess, onWatchError, { timeout: 30000 });
+//**** BEGIN Cookie stuff ******
+function savePreferences() {
+    log("Saving preferences " + stationDepartAbbr + " and " + stationArriveAbbr,1);
+    $.cookie('bna_cookie_depart', stationDepartAbbr);
+    $.cookie('bna_cookie_arrive', stationArriveAbbr);
+    log("   preferences saved.",1)
 }
 
+function loadPreferences() {
+    log("Loading preferences...",1)
+    stationDepartAbbr = $.cookie('bna_cookie_depart');
+    stationArriveAbbr = $.cookie('bna_cookie_arrive');
+    $("#select-depart").val(stationDepartAbbr).selectmenu("refresh", true);
+    $("#select-arrive").val(stationArriveAbbr).selectmenu("refresh", true);
 
-//function onGeoSuccess(position) {
-//    var element = document.getElementById('geolocation');
-//    element.innerHTML = 'Latitude: ' + position.coords.latitude            + '<br />' +
-//            'Longitude: '          + position.coords.longitude             + '<br />' +
-//            'Altitude: '           + position.coords.altitude              + '<br />' +
-//            'Accuracy: '           + position.coords.accuracy              + '<br />' +
-//            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-//            'Heading: '            + position.coords.heading               + '<br />' +
-//            'Speed: '              + position.coords.speed                 + '<br />' +
-//            'Timestamp: '          + position.timestamp                    + '<br />';
-//}
-//
-//// onError Callback receives a PositionError object
-////
-//function onGeoError(error) {
-//    alert('code: '    + error.code    + '\n' +
-//            'message: ' + error.message + '\n');
-//}
+    log("stationDepartAbbr preference loaded: " + stationDepartAbbr,1);
+    log("stationArriveAbbr preference loaded: " + stationArriveAbbr,1);
+    log("  Preferences loaded, calling newTrip.",1);
+    newTrip();
+}
 
-
-// onSuccess Callback
-//   This method accepts a `Position` object, which contains
-//   the current GPS coordinates
-//
-//    function onWatchSuccess(position) {
-//        var element = document.getElementById('geolocation');
-//        element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
-//                'Longitude: ' + position.coords.longitude     + '<br />' +
-//                '<hr />'      + element.innerHTML;
-//    }
-//
-//    // onError Callback receives a PositionError object
-//    //
-//    function onWatchError(error) {
-//        alert('code: '    + error.code    + '\n' +
-//                'message: ' + error.message + '\n');
-//    }
-//********** END - GPS STUFF *****************************************************************
-
+//**** END Cookie stuff ******
 
 
 //*********** CSV - GTFS ***************************************************************

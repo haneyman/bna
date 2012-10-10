@@ -10,6 +10,7 @@
     <script src="../assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
     <script src="../assets/js/bna.js"></script>
     <script src="qunit.js"></script>
+    <script src="../assets/js/jquery.cookie.js"></script>
     <!--<script src="tests.js"></script>-->
     <script>
         test( "hello test", function() {
@@ -90,6 +91,32 @@
             equal(time, expectedTime, 'Correct time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest + ' day: ' + dayOfWeek + ' time: ' + curtime);
         }
         //end of trip tims modules
+
+
+        //Cookie tests
+        module( "Cookies", {
+            setup: function() {
+            }, teardown: function() {
+            }
+        });
+
+        test('Save to cookie', function() {
+            ok($.cookie('bna_cookie_orig', "orig"),"Cookie saves problem");//create session cookie
+            ok($.cookie('bna_cookie_dest', "dest"),"Cookie saves problem");//create session cookie
+        });
+
+        test('Read from cookie', function() {
+            var orig = $.cookie('bna_cookie_orig');
+            var dest = $.cookie('bna_cookie_dest');
+            console.log("Orig: " + orig);
+            console.log("Dest: " + dest);
+            //$.cookie('the_cookie'); // => "the_value"
+            ok(orig=="orig","Orig = orig");
+            ok(dest=="dest","Dest = dest");
+        });
+
+
+
 
 
     </script>
