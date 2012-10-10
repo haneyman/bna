@@ -14,6 +14,7 @@
 <script src="assets/js/bna.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     $(document).ready(function(){
+    //$(document).bind('pageinit') {
         log("Docready starting...",1);
         $('#debugLog').hide();
 
@@ -137,14 +138,13 @@
 
         <div id="alarmStatus" style="">
             <!--<a data-corners="true" data-shadow="true" data-wrapperels="span" class="ui-shadow ui-btn-corner-all">29 min </a>-->
-            <div class="ui-bar ui-bar-e" style="ZZheight: 100px;">
-                <div  style="font-size: 24px;font-weight: 800;text-align: center;display:inline-block; width:92%; margin-top:5px;">
-                    <span id="timeRemaining"></span>
-                    <img id="imagePulse" src="/bna/assets/img/circle3.png" height="15px;">
+            <div class="ui-bar ui-bar-e" style="">
+                <div  style="float:left;font-size: 24px;font-weight: 800;text-align: center;display:inline-block; width:85%; margin-top:5px;margin-left: 10px;">
+                    <span style="" id="timeRemaining"></span>
                 </div>
-                <!--<div style="float:right;margin-right: 50px;">-->
-
-                <!--</div>-->
+                <div style="float:right;width:30px;margin-top: 10px;">
+                    <img id="imagePulse" src="/bna/assets/img/circle3.png" height="15px">
+                </div>
             </div>
         </div>
 

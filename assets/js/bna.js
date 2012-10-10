@@ -17,8 +17,8 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = false;
-var debugLevel = 2;//0-detailed, 1-less detailed, 2-summary level
+var isDebug = true;
+var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
 var stopTimesFilenameURL = "/bna/gtfs/stop_times.txt";
 var stationsURL = "/bna/gtfs/stops.txt";
 //var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
@@ -45,9 +45,10 @@ function newTrip() {
     stationDepartAbbr = $("#select-depart option:selected").val();
     stationArriveAbbr = $("#select-arrive option:selected").val();
     $("#departTime").html("");
-    $("#buttonStartTime").show();
+    $("#buttonStartTime").hide();
     $('.arriveTime').hide();
     if (stationDepartAbbr.length > 0 && stationArriveAbbr.length > 0) {
+        $("#buttonStartTime").show();
         $('#departTime').html("Searching...");
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr, currentdayOfWeek, getCurrentTimeHHMMSS());
         log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes",1);
@@ -143,20 +144,6 @@ function addToTime(time, addSeconds) {
 
 
 //****** START - ALARM STUFF *******************
-//alert
-function alarm() {
-    log("ALARM, type: " + alarmType,1);
-    navigator.notification.alert("Wakey, wakey, you are approaching your station.",
-        alarmCallback(), "Wakey", "Okie Dokie");
-    if (alarmType == 1 || alarmType == 3) {
-        //navigator.notification.beep(5);
-        playStream(alarmFileURL);
-    }
-    if (alarmType == 2 || alarmType == 3) {
-        navigator.notification.vibrate(5000);
-    }
-}
-
 //check if ok to turn alarm on
 function alarmable() {
     if (stationDepartAbbr == "") {
@@ -177,9 +164,6 @@ function alarmOn() {
     if (alarmable()) {
         log("alarm ON",1);
         $('#alarmStatus').show();
-        //departTime = new Date();//TODO: Setting departTime to current time for now
-        //arriveTime = new Date();
-        //arriveTime.setTime(departTime.getTime() + (tripTime * 1000));//tripTime is in seconds
         log("  departTime = " + formatDateToTime(departTime) + "  arrive:" + formatDateToTime(arriveTime),1);
         timeout=setTimeout(function(){updateAlarmDisplay()},1000);
     }
@@ -187,12 +171,11 @@ function alarmOn() {
 
 //called via setTimout every second
 function updateAlarmDisplay() {
-    //log("updateAlarm()")
+    //log("updateAlarmDisplay()")
     $('.arriveTime').html(formatDateToTime(arriveTime));
     var diff = (arriveTime.getTime() - new Date().getTime()) ;
 
     $('#timeRemaining').html(formatMilliseconds(diff));
-    //$('#progressbar').val(diff / tripTime);
     $('#imagePulse').fadeIn('slow', function() {
         $('#imagePulse').fadeOut('slow');
     });
@@ -200,11 +183,32 @@ function updateAlarmDisplay() {
         //if (diff < 0)
         //    $('#timeRemaining').html("ARRIVED");
         //else
-        log(" time remaining less than " + MINUTES_BEFORE_ARRIVAL,2);
+//        $("#timeRemaining").effect( "pulsate",{times:5}, 3000 );
+        log(" time remaining less than " + MINUTES_BEFORE_ARRIVAL,1);
         alarm();
     } else {
         timeout=setTimeout(function(){updateAlarmDisplay()},5000);
     }
+}
+
+//alert
+function alarm() {
+    log("ALARM, type: " + alarmType,1);
+    navigator.notification.alert("Wakey, wakey, you are approaching your station.",
+        alarmCallback(), "Wakey", "Okie Dokie");
+    if (alarmType == 1 || alarmType == 3) {
+        //navigator.notification.beep(5);
+        playStream(alarmFileURL);
+    }
+    if (alarmType == 2 || alarmType == 3) {
+        navigator.notification.vibrate(5000);
+    }
+}
+
+function alarmCallback() {
+    //cancel alarm?
+    //alarmAudio.pause();
+    alarmOff();
 }
 
 function alarmOff() {
@@ -261,10 +265,6 @@ function padTime(i) {
     return i;
 }
 
-function alarmCallback() {
-    //cancel alarm?
-    //alarmAudio.pause();
-}
 //****** END - ALARM STUFF *******************
 
 //****** START - Audio
