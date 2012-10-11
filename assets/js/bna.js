@@ -17,10 +17,10 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = true;
+var isDebug = false;
 var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
-var stopTimesFilenameURL = "/bna/gtfs/stop_times.txt";
-var stationsURL = "/bna/gtfs/stops.txt";
+var stopTimesFilenameURL = "gtfs/stop_times.txt";
+var stationsURL = "gtfs/stops.txt";
 //var stopTimesFilenameURL = "gtfs/stop_times_test.txt";
 //
 
@@ -300,8 +300,10 @@ function loadPreferences() {
     log("Loading preferences...",1)
     stationDepartAbbr = $.cookie('bna_cookie_depart');
     stationArriveAbbr = $.cookie('bna_cookie_arrive');
-    $("#select-depart").val(stationDepartAbbr).selectmenu("refresh", true);
-    $("#select-arrive").val(stationArriveAbbr).selectmenu("refresh", true);
+    if (stationDepartAbbr != null && stationDepartAbbr != "")
+        $("#select-depart").val(stationDepartAbbr).selectmenu("refresh", true);
+    if (stationArriveAbbr != null && stationArriveAbbr != "")
+        $("#select-arrive").val(stationArriveAbbr).selectmenu("refresh", true);
 
     log("stationDepartAbbr preference loaded: " + stationDepartAbbr,1);
     log("stationArriveAbbr preference loaded: " + stationArriveAbbr,1);
@@ -319,7 +321,7 @@ function loadPreferences() {
 function loadStopTimes() {
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     //    var csvfile = "gtfs/stop_times_test.txt";
-    log("loading gtfs stoptimes...",2);
+    log("loading gtfs stoptimes from " + stopTimesFilenameURL,2);
     $.ajax({
         url : stopTimesFilenameURL,
         dataType : "text",
