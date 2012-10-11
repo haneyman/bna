@@ -17,7 +17,7 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = false;
+var isDebug = true;
 var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
 var stopTimesFilenameURL = "gtfs/stop_times.txt";
 var stationsURL = "gtfs/stops.txt";
