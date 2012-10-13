@@ -49,7 +49,6 @@ function newTrip() {
     alarmOff();
     stationDepartAbbr = $("#select-depart option:selected").val();
     stationArriveAbbr = $("#select-arrive option:selected").val();
-    savePreferences();
     $("#departTime").html("");
     $("#buttonStartTime").hide();
     $('.arriveTime').hide();
@@ -66,6 +65,7 @@ function newTrip() {
         } else {
             $('#departTime').html("Error");
         }
+        savePreferences();
     }
 }
 
@@ -379,13 +379,18 @@ function loadStations() {
 
 //looks in arrayStopTimes to find orig and dest and returns time
 function getTripTime(orig, dest, targetDateTime ) {
-    log("getTripTime() for orig: " + orig + "   dest: " + dest + " targetDateTime: " + targetDateTime,2);
-    if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
+    log("getTripTime() for " + orig + " to " + dest + " at " + targetDateTime,2);
+    log("getTripTime() mark 1",1);
+    if (orig == null || dest == null || orig == "" || dest == "" || dest == orig) {
+        alert('ERROR - ORIG and/or DEST is null!');
         return;
+    }
+    log("getTripTime() mark 2",1);
     if (targetDateTime == null || targetDateTime == undefined) {
         alert('ERROR - Taget Time is null!');
         return;
     }
+    log("getTripTime() mark 3",1);
     departTime = null;
     arriveTime = null;
     //var now = new Date();
@@ -396,7 +401,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     var stopTimeStopId;
     var inRoute = false;
     var inRouteDepartTime;
-    log("getTripTime() mark 1",1);
+    log("getTripTime() mark 4",1);
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
@@ -412,7 +417,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
     var timeString = "";
-    log("getTripTime() mark 2",1);
+    log("getTripTime() mark 5",1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
