@@ -13,9 +13,9 @@
     <script src="../assets/js/jquery.cookie.js"></script>
     <!--<script src="tests.js"></script>-->
     <script>
-        test( "hello test", function() {
-            ok( 2 ==2, "Needs to be equal!" );
-        });
+        //override
+        stopTimesFilenameURL = "stop_times.txt";
+        stationsURL = "stops.txt";
 
         var expStations = 48;
         var expStopTimes = 29462;
@@ -34,47 +34,47 @@
         });
         //Trip Times
         test('Get Trip Times - Conc to Embr 16:00', function() {
-            testGetTripTime("CONC","EMBR","MON","16:00:00", 2580)
+            testGetTripTime("CONC","EMBR",new Date("October 15, 2012 16:00:00"), 2580);
         });
 
         test('Get Trip Times = Conc to Embr 16:00 again', function() {
-            testGetTripTime("CONC","EMBR","MON","16:00:00", 2580)
+            testGetTripTime("CONC","EMBR",new Date("October 15, 2012 16:00:00"), 2580)
         });
 
         test('Get Trip Times = Embr to Conc 16:00', function() {
-            testGetTripTime("EMBR","CONC","MON","16:00:00", 2460)
+            testGetTripTime("EMBR","CONC",new Date("October 15, 2012 16:00:00"), 2460)
         });
 
         test('Get Trip Times = Conc to 16th 18:13', function() {
-            testGetTripTime("CONC","16TH","FRI","18:13:00", 2940)
+            testGetTripTime("CONC","16TH",new Date("October 19, 2012 16:13:00"), 2940)
         });
 
         test('Get Trip Times - Conc to Embr 8:00', function() {
-            testGetTripTime("CONC","EMBR","MON","8:00:00", 2580)
+            testGetTripTime("CONC","EMBR",new Date("October 15, 2012 8:00:00"), 2580)
         });
 
         test('Get Trip Times - Conc to Embr 23:00', function() {
-            testGetTripTime("CONC","EMBR","MON","23:00:00", 2580)
+            testGetTripTime("CONC","EMBR",new Date("October 15, 2012 23:00:00"), 2700)
         });
 
         test('Get Trip Times = Embr to Conc 8:00', function() {
-            testGetTripTime("EMBR","CONC","MON","8:00:00", 2460)
+            testGetTripTime("EMBR","CONC",new Date("October 15, 2012 8:00:00"), 2460)
         });
 
         test('Get Trip Times = Embr to Conc 11:00 SAT', function() {
-            testGetTripTime("EMBR","CONC","SAT","11:00:00", 2520)
+            testGetTripTime("EMBR","CONC",new Date("October 13, 2012 11:00:00"), 2520)
         });
 
         test('Get Trip Times = Embr to Conc 11:00 SUN', function() {
-            testGetTripTime("EMBR","CONC","SUN","11:00:00", 2520)
+            testGetTripTime("EMBR","CONC",new Date("October 15, 2012 11:00:00"), 2460)
         });
 
         test('Get Trip Times = Embr to Conc 23:00 SAT', function() {
-            testGetTripTime("EMBR","CONC","SAT","23:00:00", 2520)
+            testGetTripTime("EMBR","CONC",new Date("October 13, 2012 23:00:00"), 2520)
         });
 
         test('Get Trip Times = Embr to Conc 23:00 SUN', function() {
-            testGetTripTime("EMBR","CONC","SUN","23:00:00", 2520)
+            testGetTripTime("EMBR","CONC",new Date("October 14, 2012 23:00:00"), 2520)
         });
 
 //        test("basics", function() {
@@ -87,12 +87,12 @@
 //        });
 
 
-        function testGetTripTime(origin, dest, dayOfWeek, curtime, expectedTime) {
+        function testGetTripTime(origin, dest, curDateTime, expectedTime) {
             if (arrayStopTimes.length == 0)
                 loadStopTimes();
-            var time = getTripTime(origin, dest, dayOfWeek, curtime);
-
-            equal(time, expectedTime, 'Correct time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest + ' day: ' + dayOfWeek + ' time: ' + curtime);
+            var time = getTripTime(origin, dest, curDateTime);
+            log("Time returned is:") + time;
+            equal(time, expectedTime, 'Incorrect time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest +  ' time: ' + curDateTime);// curtime.toString('dd-MMM-yyyy HH:MM'));
         }
         //end of trip tims modules
 
@@ -122,7 +122,6 @@
 
 
 
-
     </script>
     <!--<script src="tests.js"></script>-->
 </head>
@@ -133,5 +132,8 @@
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
     <div id="qunit-fixture">test markup</div>
+
+    <!--<a href="/gtfs/stop_times.txt"-->
+
 </body>
 </html>
