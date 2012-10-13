@@ -56,6 +56,7 @@ function newTrip() {
     if (stationDepartAbbr.length > 0 && stationArriveAbbr.length > 0) {
         $("#buttonStartTime").show();
         $('#departTime').html("Searching...");
+        log("new date is " + new Date());
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr, new Date());
         log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes",1);
         $('#departTime').html("?");
@@ -378,7 +379,7 @@ function loadStations() {
 
 //looks in arrayStopTimes to find orig and dest and returns time
 function getTripTime(orig, dest, targetDateTime ) {
-    log("getTripTime() for orig: " + orig + "   dest: " + dest + " targetDateTime: " + targetDateTime.toString('MM-dd-yyyy HH:MM'),2);
+    log("getTripTime() for orig: " + orig + "   dest: " + dest + " targetDateTime: " + targetDateTime,2);
     if (orig == null || dest == null || orig == "" || dest == "" || dest == orig)
         return;
     if (targetDateTime == null || targetDateTime == undefined) {
@@ -395,6 +396,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     var stopTimeStopId;
     var inRoute = false;
     var inRouteDepartTime;
+    log("getTripTime() mark 1",1);
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
@@ -410,6 +412,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
     var timeString = "";
+    log("getTripTime() mark 2",1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
@@ -420,7 +423,10 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
+        if (i < 100)
+            log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
+        else
+            log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
         if ((stopTimeTripId.indexOf("SUN") >= 0 && targetDayOfWeek == "SUN")  //its sunday
             || (stopTimeTripId.indexOf("SAT") >= 0 && targetDayOfWeek == "SAT") //its saturday
             || (targetDayOfWeek != "SAT" && targetDayOfWeek != "SUN" && stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
