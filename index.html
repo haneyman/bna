@@ -65,12 +65,12 @@
 <section id="pageHome" data-role="page" data-fullscreen="true" data-theme="a">
     <header data-role="header" data-id="header"  data-theme="d">
         <div style="text-align:center">
-            <img src="/bna/assets/img/logoTrans.png" height="50px;">
+            <img src="assets/img/logoTrans.png" height="50px;">
         </div>
     </header>
     <div class="content" data-role="content" style="margin-left: 5px;width:300px;">
         <div style="margin-top: 15px;">
-            <div  style="height: 10px;" ondblclick="$('#debugLog').toggle();">
+            <div  style="height: 10px;" >
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
                 <div style="float:left;height: 10px;margin-top: 9px;">Start</div>
                 <div style="float:right;margin-bottom: 13px;height: 10px;font-size: 8px;">
@@ -131,12 +131,12 @@
                     <span style="" id="timeRemaining"></span>
                 </div>
                 <div style="float:right;width:30px;margin-top: 10px;">
-                    <img id="imagePulse" src="/bna/assets/img/circle3.png" height="15px">
+                    <img id="imagePulse" src="assets/img/circle3.png" height="15px">
                 </div>
             </div>
         </div>
 
-        <div id="debugLog" style="font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
+        <div id="debugLog" style="overflow:visible;font-size: 10px; color: #C97917;background-color: #fff9df;" data-role="collapsible">
             <h3>Debug Log</h3>
             <a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;
             <a href="#"  onclick="clearLog();">Clear</a>&nbsp;&nbsp;&nbsp;
@@ -150,8 +150,12 @@
     </div>
     <footer data-role="footer" data-id="footer"  data-position="fixed" style="height:35px;padding: 5px;">
         <a href="http://www.mtsconsulting.biz/bna/aboutLink"><span style="font-size: 10px;color: #b0c4de;font-style: italic;">by MTS</span></a>
+        <a id="buttonDebug" href="#" data-role="button" data-mini="true" onclick="$('#debugLog').toggle();">DEBUG</a>
         <div style="float:right;margin-right: 10px;">
             <a href="#pageMap"  ZZdata-rel="dialog" data-role="button">BART Map</a>
+        </div>
+        <div style="float:right;margin-right: 100px;margin-top: 15px;color:#d0d0d0;">
+            v0.1
         </div>
     </footer>
 </section>

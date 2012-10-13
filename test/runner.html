@@ -45,6 +45,10 @@
             testGetTripTime("EMBR","CONC","MON","16:00:00", 2460)
         });
 
+        test('Get Trip Times = Conc to 16th 18:13', function() {
+            testGetTripTime("CONC","16TH","FRI","18:13:00", 2940)
+        });
+
         test('Get Trip Times - Conc to Embr 8:00', function() {
             testGetTripTime("CONC","EMBR","MON","8:00:00", 2580)
         });

@@ -32,6 +32,10 @@ function initialize() {
     $("#buttonStartTime").hide();
     alarmOff();
     loadPreferences();
+    if (isDebug)
+        $('#buttonDebug').show();
+    else
+        $('#buttonDebug').hide();
     log("Initialized.  Debug is " + isDebug + "  with level of " + debugLevel, 2 );
 }
 
