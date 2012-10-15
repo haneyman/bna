@@ -21,16 +21,18 @@
         var expStopTimes = 29462;
         module( "Trip Times", {
             setup: function() {
+                stopTimesFilenameURL = "stop_times.txt";
+                stationsURL = "stops.txt";
             }, teardown: function() {
             }
         });
 
         test('Load stations', function() {
-            ok(loadStations()==expStations,"Correct number of stations of " + expStations);
+            equal(loadStations(),expStations,"Correct number of stations of " + expStations);
         });
 
         test('Load times', function() {
-            ok(loadStopTimes()==expStopTimes,"Correct number of stoptimes of " + expStopTimes);
+            equal(loadStopTimes(),expStopTimes,"Correct number of stoptimes of " + expStopTimes);
         });
         //Trip Times
         test('Get Trip Times - Conc to Embr 16:00', function() {
@@ -88,11 +90,11 @@
 
 
         function testGetTripTime(origin, dest, curDateTime, expectedTime) {
-            if (arrayStopTimes.length == 0)
+            if (arrayStopTimes == null || arrayStopTimes == undefined || arrayStopTimes.length == 0)
                 loadStopTimes();
             var time = getTripTime(origin, dest, curDateTime);
-            log("Time returned is:") + time;
-            equal(time, expectedTime, 'Incorrect time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest +  ' time: ' + curDateTime);// curtime.toString('dd-MMM-yyyy HH:MM'));
+            log("Time returned is:" + time,2);
+            equal(time, expectedTime, 'Must get time of ' + expectedTime/60 + ' min for ' + origin + ' to ' + dest +  ' time: ' + time/60);// curtime.toString('dd-MMM-yyyy HH:MM'));
         }
         //end of trip tims modules
 

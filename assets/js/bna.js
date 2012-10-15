@@ -12,6 +12,8 @@ var url = "";
 var bartApiResult;
 var BART_API_KEY = "&key=UBHV-T2TG-U2UQ-2VA5";
 var arrayStopTimes = [];
+var arrayTripsPast = [];  //a trip is an array of 0-start time, 1-end time
+var arrayTripsFuture = [];
 var arrayStations  = [];
 var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
@@ -380,28 +382,25 @@ function loadStations() {
 //looks in arrayStopTimes to find orig and dest and returns time
 function getTripTime(orig, dest, targetDateTime ) {
     log("getTripTime() for " + orig + " to " + dest + " at " + targetDateTime,2);
-    log("getTripTime() mark 1",1);
     if (orig == null || dest == null || orig == "" || dest == "" || dest == orig) {
         alert('ERROR - ORIG and/or DEST is null!');
         return;
     }
-    log("getTripTime() mark 2",1);
     if (targetDateTime == null || targetDateTime == undefined) {
         alert('ERROR - Taget Time is null!');
         return;
     }
-    log("getTripTime() mark 3",1);
     departTime = null;
     arriveTime = null;
     //var now = new Date();
+    var trip;//array for trips to save, 0 is depart date object, 1 is arrive date object
     var stopTimeTripId;
-    var currentTripId;
-    var origSequence=0;
+    var inRouteTripId;
+    var inRouteDepartSequence=0;
     var stopTimeSequence;
     var stopTimeStopId;
     var inRoute = false;
-    var inRouteDepartTime;
-    log("getTripTime() mark 4",1);
+    var inRouteDepartTime =  null;
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
@@ -417,7 +416,6 @@ function getTripTime(orig, dest, targetDateTime ) {
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
     var timeString = "";
-    log("getTripTime() mark 5",1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
@@ -428,58 +426,91 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 000)
+        if (i < 0)
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
         else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
-        if ((stopTimeTripId.indexOf("SUN") >= 0 && targetDayOfWeek == "SUN")  //its sunday
-            || (stopTimeTripId.indexOf("SAT") >= 0 && targetDayOfWeek == "SAT") //its saturday
-            || (targetDayOfWeek != "SAT" && targetDayOfWeek != "SUN" && stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
-            if (stopTimeStopId == orig) { //matching origin
-                if (stopTimeDepartDateTime < targetDateTime  //previous to current time
-                    && stopTimeDepartDateTime > departTime) {//more recent the current match
-                    inRoute = true;
-                    origSequence = stopTimeSequence;
-                    currentTripId = stopTimeTripId;
-                    inRouteDepartTime = stopTimeDepartDateTime;
-                    log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime,0);
-                }
-            } else {
-                if (inRouteDepartTime = null || inRouteDepartTime == undefined) {
-                    log("   BAD inRouteDepartTime in id " + stopTimeTripId);
-                    //skip rout
-                    currentTripId = stopTimeTripId;
-                    inRoute = false;
-                } else {
-                    if (stopTimeTripId != currentTripId
-                        || parseInt(stopTimeSequence) < parseInt(origSequence)) {
-                        log("   station rejected",0);
-                        //if (stopTimeSequence < origSequence)
-                        //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
-                        //skip rout
-                        currentTripId = stopTimeTripId;
-                        inRoute = false;
-                    } else {
-                        log("station not rejected",0);
-                        if (inRoute) {
-                            log("in route",0);
-                            if (stopTimeStopId == dest) {
-                                arriveTime = stopTimeDepartDateTime;//remember the Date
-                                departTime = inRouteDepartTime;
-                                log("     Potential trip found: " + formatDateToTime(departTime) + " - "
-                                    + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
-                                inRoute = false;//keep looking for better times
-                                //break;
+
+        if (inRoute) {  //we matched departing station already so now looking for dest in current trip
+            if (stopTimeTripId == inRouteTripId) { //still the same trip
+                if (parseInt(stopTimeSequence) > parseInt(inRouteDepartSequence)) {  //sequence is higher
+                    if (stopTimeStopId == dest) {  //found dest, we have a potential trip
+                        if (inRouteDepartTime == null || inRouteDepartTime == undefined || typeof inRouteDepartTime != 'object') {
+                            log("    found dest but inRouteDepartTime is bad: " + inRouteDepartTime + "  id:" + stopTimeTripId,1);
+                            inRoute = false;//keep looking for better times
+                        } else {
+                            if (inRouteDepartTime > targetDateTime) {//leaving AFTER target time
+                                if ((inRouteDepartTime - targetDateTime)/1000/60 < 60) { //leaving within 60 minutes
+                                    trip = [inRouteDepartTime, stopTimeDepartDateTime];
+                                    arrayTripsFuture.push(trip);
+                                    log("     Future trip found id:" + inRouteTripId + "  " + formatDateToTime(departTime) + " - " +  + formatDateToTime(stopTimeDepartDateTime),1);
+                                }
+                            } else {  //trip departs BEFORE target time
+                                if ((targetDateTime - stopTimeDepartDateTime)/1000/60 < 60) {
+                                    trip = [inRouteDepartTime, stopTimeDepartDateTime];
+                                    arrayTripsPast.push(trip);
+                                    log("     Past trip found.",1);
+                                    if (inRouteDepartTime > departTime) {
+                                        arriveTime = stopTimeDepartDateTime;//remember the Date
+                                        departTime = inRouteDepartTime;
+                                        log("     Potential trip found: " + formatDateToTime(departTime) + " - "
+                                            + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
+                                    }
+                                }
                             }
+                            inRoute = false;//reset, look for next trip
                         }
                     }
+                } else {
+                    log("   same trip id but lower sequence?  rejecting and starting over ",1);
+                    inRoute = false;
                 }
+            } else { //new trip
+                //log("dest rejected because of new trip id  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
+                inRouteTripId = stopTimeTripId;
+                inRoute = false;
             }
-        } //else
+        } else {  //looking for departing station
+            if ((stopTimeTripId.indexOf("SUN") >= 0 && targetDayOfWeek == "SUN")  //its sunday
+                || (stopTimeTripId.indexOf("SAT") >= 0 && targetDayOfWeek == "SAT") //its saturday
+                || (targetDayOfWeek != "SAT" && targetDayOfWeek != "SUN" && stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
+                if (stopTimeStopId == orig) { //matching origin
+                    //if (stopTimeDepartDateTime <= targetDateTime) {  //previous to current time, already left
+                        //if ((targetDateTime - stopTimeDepartDateTime)/1000/60 < 60 ) {//less than an hour ago, eliminate
+                            //if (stopTimeDepartDateTime > departTime) {//more recent than current best match
+                                inRoute = true;
+                                inRouteDepartSequence = stopTimeSequence;
+                                inRouteTripId = stopTimeTripId;
+                                inRouteDepartTime = stopTimeDepartDateTime;
+                            //}
+                            //Add this to list of previous potential trips
+                        //} else {
+                        //}
+                    //} else { //future date
+                        //log("   stop departs in future ",0);
+                        //if ((stopTimeDepartDateTime - targetDateTime)/1000/60 < 60 ) {//up to an hour in future, eliminate
+                            //continue but add to list of futures?
+                        //    inRoute = true;
+                        //    origSequence = stopTimeSequence;
+                        //    currentTripId = stopTimeTripId;
+                        //    inRouteDepartTime = stopTimeDepartDateTime;
+                        //}
+                    //}
+                    //Add this to list of future potential trips
+                } else {
+                    log("  stop does not match origin ",0);
+                    inRouteTripId = stopTimeTripId;
+                    inRouteDepartTime = null;
+                }
+            } else {//else, days don't match
+                log("  stop does not have correct day ",0);
+            }
+        }
     }
+    //finished searching through all the trips (stop_times)
     if (arriveTime != null && departTime != null) {
         var tripTime = (arriveTime - departTime)/1000;
-        log("  Returning trip found: " + tripTime + "sec (" + tripTime/60 + "min) " + formatDateToTime(departTime) + " - " + formatDateToTime(arriveTime),2);
+        log("  BEST trip found: " + tripTime + "sec (" + tripTime/60 + "min) " + formatDateToTime(departTime) + " - " + formatDateToTime(arriveTime),2);
         log("getTripTime normal done.",1);
         return tripTime;//in seconds
         //                    return (timeDiff(origTime, destTime))
