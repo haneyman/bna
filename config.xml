@@ -7,13 +7,17 @@
 	<name>BartNapApp</name>
 
 	<description>
-		Allows a BART rider to be alerted when their train is about to arrive.  Reads a local GTFSschedule
-        to figure out when the train will arrive.  User phonegap and JQuery mobile frameworks.
+		For people who want to take a nap on BART.  It alerts a BART rider when their train is about to arrive at destination station.
+        Enter station you just got on and enter station you're heading to.  An alarm wakes you via sound and/or vibration.
+
+        NOTE: Must leave application running foreground.
+
+        How - Reads a local GTFS schedule to figure out when the train will arrive.  Using phonegap and JQuery mobile frameworks.
 	</description>
 
 	<author href="http://blah.com"
 		email="haneyman@yahoo.com">
-		M Haney
+		MTS Consulting
 	</author>
 
 	<icon src="icon.png" gap:role="default" ddd="" />

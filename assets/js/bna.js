@@ -75,9 +75,9 @@ function newTrip() {
 function log(msg, level) {
     if (isDebug) {
         if (level >= debugLevel) {
-            if ($('#log').is(':visible') )
+            //if ($('#log').is(':visible') )
                 $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
-            else
+            //else
                 if( (window['console'] !== undefined) )
                     console.log(getCurrentTime() + " - " + msg);
         }
@@ -428,7 +428,7 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 100)
+        if (i < 000)
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
         else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
@@ -445,23 +445,32 @@ function getTripTime(orig, dest, targetDateTime ) {
                     log("   Orig found, sequence is " + origSequence + " trip id " + currentTripId + "  time " + departTime,0);
                 }
             } else {
-                if (stopTimeTripId != currentTripId || parseInt(stopTimeSequence) < parseInt(origSequence)) {
-                    log("   station rejected",0);
-                    //if (stopTimeSequence < origSequence)
-                    //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
+                if (inRouteDepartTime = null || inRouteDepartTime == undefined) {
+                    log("   BAD inRouteDepartTime in id " + stopTimeTripId);
+                    //skip rout
                     currentTripId = stopTimeTripId;
                     inRoute = false;
                 } else {
-                    log("station not rejected",0);
-                    if (inRoute) {
-                        log("in route",0);
-                        if (stopTimeStopId == dest) {
-                            arriveTime = stopTimeDepartDateTime;//remember the Date
-                            departTime = inRouteDepartTime;
-                            log("     Potential trip found: " + formatDateToTime(departTime) + " - "
-                                + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
-                            inRoute = false;//keep looking for better times
-                            //break;
+                    if (stopTimeTripId != currentTripId
+                        || parseInt(stopTimeSequence) < parseInt(origSequence)) {
+                        log("   station rejected",0);
+                        //if (stopTimeSequence < origSequence)
+                        //log("dest rejected because of sequence  " + stopTimeTripId + "  " + currentTripId + "  curr seq=" + stopTimeSequence + "  orig seq=" + origSequence)
+                        //skip rout
+                        currentTripId = stopTimeTripId;
+                        inRoute = false;
+                    } else {
+                        log("station not rejected",0);
+                        if (inRoute) {
+                            log("in route",0);
+                            if (stopTimeStopId == dest) {
+                                arriveTime = stopTimeDepartDateTime;//remember the Date
+                                departTime = inRouteDepartTime;
+                                log("     Potential trip found: " + formatDateToTime(departTime) + " - "
+                                    + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
+                                inRoute = false;//keep looking for better times
+                                //break;
+                            }
                         }
                     }
                 }
