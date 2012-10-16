@@ -59,7 +59,7 @@ function newTrip() {
         $('#departTime').html("Searching...");
         log("new date is " + new Date());
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr, new Date());
-        //loadTripTimes();
+        loadTripTimes();
         log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes",1);
         $('#departTime').html("?");
         if (tripTime != null) {
@@ -75,18 +75,25 @@ function newTrip() {
 function loadTripTimes() {
     var str;
     var trip;//array of depart, arrive
+    var i,j;
+    $("#radioTrips").append("<br/>Past -<br/>");
     for (i=0; i < arrayTripsPast.length; i++) {
         trip = arrayTripsPast[i];
         str = "<input type='radio' name='radio-startTime' id='radio-startTime-" + i + "' value='choice-" + i + "' />";// + " checked='checked' />"
         str += "<label for='radio-startTime-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
         $("#radioTrips").append(str);
     }
-    for (i=0; i < arrayTripsFuture.length; i++) {
-        trip = arrayTripsFuture[i];
-        str = "<input type='radio' name='radio-startTimeFuture' id='radio-startTimeFuture-" + i + "' value='choice-" + i + "' />";// + " checked='checked' />"
-        str += "<label for='radio-startTimeFuture-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
-        $("#radioTripsFuture").append(str);
+    $("#radioTrips").append("<br/>Future -<br/>");
+    var cnt = arrayTripsPast.length;
+    for (j=0; j < arrayTripsFuture.length; j++) {
+        trip = arrayTripsFuture[j];
+        str = "<input type='radio' name='radio-startTime' id='radio-startTime-" + (j+cnt) + "' value='choice-" + (j+cnt) + "' />";// + " checked='checked' />"
+        str += "<label for='radio-startTime-" + (j+cnt) + "'> " + formatDateToTime(trip[0]) + "</label>";
+        $("#radioTrips").append(str);
     }
+    cnt=arrayTripsPast.length + arrayTripsFuture.length;
+    log("Loaded " + cnt + "trips in train selector screen.",1);
+    return cnt;
 }
 
 //**************** utilities **************************************************
@@ -468,11 +475,6 @@ function getTripTime(orig, dest, targetDateTime ) {
                                     arrayTripsFuture.push(trip);
                                     log("     Future trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
                                         + " - " + formatDateToTime(stopTimeDepartDateTime),1);
-//                                    log(stopTime[0] + " ",1);
-//                                    log(stopTime[1] + " ",1);
-//                                    log(stopTime[3] + " ",1);
-//                                    log(stopTime[4] + " ",1);
-//                                    log(stopTime[5] + " ",1);
                                 }
                             } else {  //trip departs BEFORE target time
                                 if ((targetDateTime - inRouteDepartTime)/1000/60 < 60) {
@@ -504,27 +506,10 @@ function getTripTime(orig, dest, targetDateTime ) {
                 || (stopTimeTripId.indexOf("SAT") >= 0 && targetDayOfWeek == "SAT") //its saturday
                 || (targetDayOfWeek != "SAT" && targetDayOfWeek != "SUN" && stopTimeTripId.indexOf("SAT") < 0 && stopTimeTripId.indexOf("SUN") < 0)) {//weekday
                 if (stopTimeStopId == orig) { //matching origin
-                    //if (stopTimeDepartDateTime <= targetDateTime) {  //previous to current time, already left
-                        //if ((targetDateTime - stopTimeDepartDateTime)/1000/60 < 60 ) {//less than an hour ago, eliminate
-                            //if (stopTimeDepartDateTime > departTime) {//more recent than current best match
-                                inRoute = true;
-                                inRouteDepartSequence = stopTimeSequence;
-                                inRouteTripId = stopTimeTripId;
-                                inRouteDepartTime = stopTimeDepartDateTime;
-                            //}
-                            //Add this to list of previous potential trips
-                        //} else {
-                        //}
-                    //} else { //future date
-                        //log("   stop departs in future ",0);
-                        //if ((stopTimeDepartDateTime - targetDateTime)/1000/60 < 60 ) {//up to an hour in future, eliminate
-                            //continue but add to list of futures?
-                        //    inRoute = true;
-                        //    origSequence = stopTimeSequence;
-                        //    currentTripId = stopTimeTripId;
-                        //    inRouteDepartTime = stopTimeDepartDateTime;
-                        //}
-                    //}
+                    inRoute = true;
+                    inRouteDepartSequence = stopTimeSequence;
+                    inRouteTripId = stopTimeTripId;
+                    inRouteDepartTime = stopTimeDepartDateTime;
                     //Add this to list of future potential trips
                 } else {
                     log("  stop does not match origin ",0);

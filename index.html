@@ -19,6 +19,33 @@
         log("Docready starting...",1);
         $('#debugLog').hide();
 
+        $( '#pageStartTimes' ).live( 'pagebeforeshow',function(event, ui){
+            log("pageStartTimes pagebeforeshow ",1);
+            //var depart = formatDateToTime(departTime);
+            var trip;
+            //get index of current departTime
+            for (i=0; i < arrayTripsPast.length; i++) {
+                trip = arrayTripsPast[i];
+                if (departTime == trip[0]) {
+                    $('#radio-startTime-'+i).attr('checked', "checked").checkboxradio("refresh");
+                    log("found it: " + i,1);
+                    return;
+                }
+            }
+            $("#radioTrips").append("<br/>Future -<br/>");
+            var cnt = arrayTripsPast.length;
+            for (j=0; j < arrayTripsFuture.length; j++) {
+                trip = arrayTripsFuture[j];
+                if (departTime == trip[0]) {
+                    $('#radio-startTime-'+j).attr('checked', "checked").checkboxradio("refresh");
+                    log("found it " + j,1);
+                    return;
+                }
+            }
+
+            log("couldn't find " + departTime,1);
+
+        });
 
         $("[name=radio-alarm-state]").change(function() {
             isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
@@ -189,20 +216,10 @@
     </header>
     <div class="content" data-role="content">
         <div data-role="fieldcontain">
+            <h3>Select which train you are on -</h3>
             <fieldset data-role="controlgroup">
-                <legend>Select which train you are on:</legend>
+                <!--<legend>Departure Times:</legend>-->
                 <span id="radioTrips" >
-                <!--<input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />-->
-                <!--<label for="radio-startTime-1">Start Time 1</label>-->
-                </span>
-            </fieldset>
-            <br/>
-            Future -
-            <fieldset data-role="controlgroup">
-                <legend>Select which train you will be on on:</legend>
-                <span id="radioTripsFuture" >
-                    <input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />
-                    <label for="radio-startTime-1">Start Time 1</label>
                 </span>
             </fieldset>
         </div>
