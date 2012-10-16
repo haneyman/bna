@@ -59,6 +59,7 @@ function newTrip() {
         $('#departTime').html("Searching...");
         log("new date is " + new Date());
         tripTime = getTripTime(stationDepartAbbr, stationArriveAbbr, new Date());
+        //loadTripTimes();
         log("Stations changed in newTrip() from: " + stationDepartAbbr + " leaving: " + formatDateToTime(departTime) + " to: " + stationArriveAbbr + " arriving: " + formatDateToTime(arriveTime) + ") Time=" + tripTime/60 + " minutes",1);
         $('#departTime').html("?");
         if (tripTime != null) {
@@ -68,6 +69,23 @@ function newTrip() {
             $('#departTime').html("Error");
         }
         savePreferences();
+    }
+}
+
+function loadTripTimes() {
+    var str;
+    var trip;//array of depart, arrive
+    for (i=0; i < arrayTripsPast.length; i++) {
+        trip = arrayTripsPast[i];
+        str = "<input type='radio' name='radio-startTime' id='radio-startTime-" + i + "' value='choice-" + i + "' />";// + " checked='checked' />"
+        str += "<label for='radio-startTime-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
+        $("#radioTrips").append(str);
+    }
+    for (i=0; i < arrayTripsFuture.length; i++) {
+        trip = arrayTripsFuture[i];
+        str = "<input type='radio' name='radio-startTimeFuture' id='radio-startTimeFuture-" + i + "' value='choice-" + i + "' />";// + " checked='checked' />"
+        str += "<label for='radio-startTimeFuture-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
+        $("#radioTripsFuture").append(str);
     }
 }
 
@@ -205,6 +223,7 @@ function updateAlarmDisplay() {
 //alert
 function alarm() {
     log("ALARM, type: " + alarmType,1);
+    //noinspection JSUnresolvedVariable
     navigator.notification.alert("Wakey, wakey, you are approaching your station.",
         alarmCallback(), "Wakey", "Okie Dokie");
     if (alarmType == 1 || alarmType == 3) {
@@ -212,6 +231,7 @@ function alarm() {
         playStream(alarmFileURL);
     }
     if (alarmType == 2 || alarmType == 3) {
+        //noinspection JSUnresolvedVariable
         navigator.notification.vibrate(5000);
     }
 }
@@ -422,7 +442,8 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartTime = stopTime[1];//arrival_time, when they are at station
         if (stopTimeDepartTime.length == 7)
             stopTimeDepartTime = "0" + stopTimeDepartTime;//javascript requires hh format or craps out
-        timeString = targetDateTime.getFullYear() + "-" + mm + "-" + dd + "T" + stopTimeDepartTime;
+
+        timeString = targetDateTime.getFullYear() + "-" + mm + "-" + dd + " " + stopTimeDepartTime;
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
@@ -435,6 +456,8 @@ function getTripTime(orig, dest, targetDateTime ) {
             if (stopTimeTripId == inRouteTripId) { //still the same trip
                 if (parseInt(stopTimeSequence) > parseInt(inRouteDepartSequence)) {  //sequence is higher
                     if (stopTimeStopId == dest) {  //found dest, we have a potential trip
+                        //log("     trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
+                        //    + " - " +  formatDateToTime(stopTimeDepartDateTime),1);
                         if (inRouteDepartTime == null || inRouteDepartTime == undefined || typeof inRouteDepartTime != 'object') {
                             log("    found dest but inRouteDepartTime is bad: " + inRouteDepartTime + "  id:" + stopTimeTripId,1);
                             inRoute = false;//keep looking for better times
@@ -443,17 +466,23 @@ function getTripTime(orig, dest, targetDateTime ) {
                                 if ((inRouteDepartTime - targetDateTime)/1000/60 < 60) { //leaving within 60 minutes
                                     trip = [inRouteDepartTime, stopTimeDepartDateTime];
                                     arrayTripsFuture.push(trip);
-                                    log("     Future trip found id:" + inRouteTripId + "  " + formatDateToTime(departTime) + " - " +  + formatDateToTime(stopTimeDepartDateTime),1);
+                                    log("     Future trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
+                                        + " - " + formatDateToTime(stopTimeDepartDateTime),1);
+//                                    log(stopTime[0] + " ",1);
+//                                    log(stopTime[1] + " ",1);
+//                                    log(stopTime[3] + " ",1);
+//                                    log(stopTime[4] + " ",1);
+//                                    log(stopTime[5] + " ",1);
                                 }
                             } else {  //trip departs BEFORE target time
-                                if ((targetDateTime - stopTimeDepartDateTime)/1000/60 < 60) {
+                                if ((targetDateTime - inRouteDepartTime)/1000/60 < 60) {
                                     trip = [inRouteDepartTime, stopTimeDepartDateTime];
                                     arrayTripsPast.push(trip);
-                                    log("     Past trip found.",1);
+                                    //log("     Past trip found.",1);
                                     if (inRouteDepartTime > departTime) {
                                         arriveTime = stopTimeDepartDateTime;//remember the Date
                                         departTime = inRouteDepartTime;
-                                        log("     Potential trip found: " + formatDateToTime(departTime) + " - "
+                                        log("     Past trip found: " + formatDateToTime(departTime) + " - "
                                             + formatDateToTime(arriveTime) + "   id: " + stopTimeTripId,1);
                                     }
                                 }

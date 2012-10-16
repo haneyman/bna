@@ -182,8 +182,8 @@
     <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
 
-<section id="pageStartTimes" data-role="page"  data-theme="b">
-    <header data-role="header"  data-theme="b" style="">
+<section id="pageStartTimes" data-role="page"  data-theme="a">
+    <header data-role="header"  data-theme="a" style="">
         <a href="#pageHome" data-icon="arrow-l">Back</a>
         <h1>Departures</h1>
     </header>
@@ -191,17 +191,19 @@
         <div data-role="fieldcontain">
             <fieldset data-role="controlgroup">
                 <legend>Select which train you are on:</legend>
-                <input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />
-                <label for="radio-startTime-1">Start Time 1</label>
-
-                <input type="radio" name="radio-startTime" id="radio-startTime-2" value="choice-2"  />
-                <label for="radio-startTime-2">Dog</label>
-
-                <input type="radio" name="radio-startTime" id="radio-startTime-3" value="choice-3"  />
-                <label for="radio-startTime-3">Hamster</label>
-
-                <input type="radio" name="radio-startTime" id="radio-startTime-4" value="choice-4"  />
-                <label for="radio-startTime-4">Lizard</label>
+                <span id="radioTrips" >
+                <!--<input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />-->
+                <!--<label for="radio-startTime-1">Start Time 1</label>-->
+                </span>
+            </fieldset>
+            <br/>
+            Future -
+            <fieldset data-role="controlgroup">
+                <legend>Select which train you will be on on:</legend>
+                <span id="radioTripsFuture" >
+                    <input type="radio" name="radio-startTime" id="radio-startTime-1" value="choice-1" checked="checked" />
+                    <label for="radio-startTime-1">Start Time 1</label>
+                </span>
             </fieldset>
         </div>
     </div>
