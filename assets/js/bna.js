@@ -421,17 +421,20 @@ function getTripTime(orig, dest, targetDateTime ) {
     arriveTime = null;
     //var now = new Date();
     var trip;//array for trips to save, 0 is depart date object, 1 is arrive date object
+    log("mark 1",1);
     var stopTimeTripId;
     var inRouteTripId;
     var inRouteDepartSequence=0;
     var stopTimeSequence;
     var stopTimeStopId;
     var inRoute = false;
+    log("mark 2",1);
     var inRouteDepartTime =  null;
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
     //get target day of week
+    log("mark 3",1);
     var targetDayOfWeek = dayNames[targetDateTime.getDay()]
     var mm = $.trim(targetDateTime.getMonth() + 1);//zero based for some bizarre reason
     if (mm.length == 1)
@@ -442,6 +445,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
+    log("mark 4",1);
     var timeString = "";
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
@@ -454,7 +458,7 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 0)
+        if (i < 100)
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
         else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
