@@ -101,6 +101,9 @@ function loadTripTimes() {
 
 function log(msg, level) {
     if (isDebug) {
+        if (level == null || level == undefined) {
+            level = 1;
+        }
         if (level >= debugLevel) {
             //if ($('#log').is(':visible') )
                 $('#log').append("<br/>" + getCurrentTime() + " - " + msg);
@@ -444,20 +447,21 @@ function getTripTime(orig, dest, targetDateTime ) {
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
     var timeString = "";
-    for (i=0; i < arrayStopTimes.length; i++) {
+    for (i=1; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
         stopTimeDepartTime = stopTime[1];//arrival_time, when they are at station
         if (stopTimeDepartTime.length == 7)
             stopTimeDepartTime = "0" + stopTimeDepartTime;//javascript requires hh format or craps out
-
-        timeString = targetDateTime.getFullYear() + "-" + mm + "-" + dd + " " + stopTimeDepartTime;
-        stopTimeDepartDateTime = new Date(Date.parse(timeString));
+        var hh = stopTimeDepartTime[0] + stopTimeDepartTime[1];
+        var mm = stopTimeDepartTime[3] + stopTimeDepartTime[4];
+        stopTimeDepartDateTime = new Date(targetDateTime.getFullYear(), targetDateTime.getMonth(),
+            targetDateTime.getDate(), hh, mm);
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 0)
+        if (i < 100) {
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
-        else
+        } else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
 
         if (inRoute) {  //we matched departing station already so now looking for dest in current trip
@@ -511,7 +515,7 @@ function getTripTime(orig, dest, targetDateTime ) {
                     inRouteDepartSequence = stopTimeSequence;
                     inRouteTripId = stopTimeTripId;
                     inRouteDepartTime = stopTimeDepartDateTime;
-                    log("  match of origin found, inRouteDepartTime " + inRouteDepartTime + " " + inRouteTripId,1);
+                    log("  match found " + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTimeDepartDateTime + "  sequence: " + stopTimeSequence,0);
                     //Add this to list of future potential trips
                 } else {
                     log("  stop does not match origin ",0);
