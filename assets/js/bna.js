@@ -428,29 +428,22 @@ function getTripTime(orig, dest, targetDateTime ) {
     var stopTimeSequence;
     var stopTimeStopId;
     var inRoute = false;
-    log("mark 2",1);
     var inRouteDepartTime =  null;
     var stopTime = [];
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
     //get target day of week
-    log("mark 3 " + targetDateTime,1);
     var targetDayOfWeek = dayNames[targetDateTime.getDay()]
-    log("mark 4",1);
     var mm = $.trim(targetDateTime.getMonth() + 1);//zero based for some bizarre reason
     if (mm.length == 1)
         mm = "0" + mm;
-    log("mark 5 " + mm,1);
     var dd = $.trim(targetDateTime.getDate());
     if (dd.length == 1)
         dd = "0" + dd;
-    log("mark 6",1);
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
-    log("mark 7",1);
     var timeString = "";
-    log("mark 8",1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
@@ -462,7 +455,7 @@ function getTripTime(orig, dest, targetDateTime ) {
         stopTimeDepartDateTime = new Date(Date.parse(timeString));
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 100)
+        if (i < 0)
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
         else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
@@ -471,8 +464,8 @@ function getTripTime(orig, dest, targetDateTime ) {
             if (stopTimeTripId == inRouteTripId) { //still the same trip
                 if (parseInt(stopTimeSequence) > parseInt(inRouteDepartSequence)) {  //sequence is higher
                     if (stopTimeStopId == dest) {  //found dest, we have a potential trip
-                        //log("     trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
-                        //    + " - " +  formatDateToTime(stopTimeDepartDateTime),1);
+                        log("     trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
+                            + " - " +  formatDateToTime(stopTimeDepartDateTime),1);
                         if (inRouteDepartTime == null || inRouteDepartTime == undefined || typeof inRouteDepartTime != 'object') {
                             log("    found dest but inRouteDepartTime is bad: " + inRouteDepartTime + "  id:" + stopTimeTripId,1);
                             inRoute = false;//keep looking for better times
@@ -488,7 +481,7 @@ function getTripTime(orig, dest, targetDateTime ) {
                                 if ((targetDateTime - inRouteDepartTime)/1000/60 < 60) {
                                     trip = [inRouteDepartTime, stopTimeDepartDateTime];
                                     arrayTripsPast.push(trip);
-                                    //log("     Past trip found.",1);
+                                    log("     Past trip found.",1);
                                     if (inRouteDepartTime > departTime) {
                                         arriveTime = stopTimeDepartDateTime;//remember the Date
                                         departTime = inRouteDepartTime;
