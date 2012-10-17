@@ -434,19 +434,23 @@ function getTripTime(orig, dest, targetDateTime ) {
     var stopTimeDepartTime = "";
     var stopTimeDepartDateTime = new Date();
     //get target day of week
-    log("mark 3",1);
+    log("mark 3 " + targetDateTime,1);
     var targetDayOfWeek = dayNames[targetDateTime.getDay()]
+    log("mark 4",1);
     var mm = $.trim(targetDateTime.getMonth() + 1);//zero based for some bizarre reason
     if (mm.length == 1)
         mm = "0" + mm;
+    log("mark 5 " + mm,1);
     var dd = $.trim(targetDateTime.getDate());
     if (dd.length == 1)
         dd = "0" + dd;
+    log("mark 6",1);
     //trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
     //Look in stop times for a match to orig, then find dest where it is in same trip and
     //sequence is higher and departure time is closest prior to current time
-    log("mark 4",1);
+    log("mark 7",1);
     var timeString = "";
+    log("mark 8",1);
     for (i=0; i < arrayStopTimes.length; i++) {
         stopTime = arrayStopTimes[i];
         stopTimeTripId = stopTime[0];
