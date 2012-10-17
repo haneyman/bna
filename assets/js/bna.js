@@ -511,6 +511,7 @@ function getTripTime(orig, dest, targetDateTime ) {
                     inRouteDepartSequence = stopTimeSequence;
                     inRouteTripId = stopTimeTripId;
                     inRouteDepartTime = stopTimeDepartDateTime;
+                    log("  match of origin found, inRouteDepartTime " + inRouteDepartTime + " " + inRouteTripId,1);
                     //Add this to list of future potential trips
                 } else {
                     log("  stop does not match origin ",0);
