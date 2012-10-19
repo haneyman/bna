@@ -36,6 +36,7 @@
                 if (departTime == trip[0]) {
                     log("found in past",1);
                     $('#radio-startTime-'+i).attr('checked', "checked").checkboxradio("refresh");
+                    log("pageStartTimes past found, pagebeforeshow complete, returning. " ,1);
                     return;
                 }
             }
@@ -44,9 +45,10 @@
             for (j=0; j < arrayTripsFuture.length; j++) {
                 trip = arrayTripsFuture[j];
                 if (departTime == trip[0]) {
-                    log("found in future in " + j,1);
                     htmlNdx = j + arrayTripsPast.length;
-                    $('#radio-startTime-'+ htmlNdx).attr('checked', "checked").checkboxradio("refresh");
+                    log("found in future in arrayTripsFuture " + j + " using htmlNdx " + htmlNdx,1);
+                    $('#radio-startTime-'+htmlNdx).attr('checked', "checked").checkboxradio("refresh");
+                    log("pageStartTimes future found pagebeforeshow complete, returning. " ,1);
                     return;
                 }
             }
@@ -58,6 +60,11 @@
             var val = $('input[name=radio-startTime]:checked').val();
             var trip;
             log('selected radio: ' + val,1);
+            if (val == undefined) {
+                alert("No trip selected, please select a trip again.")
+                return;
+            }
+
             if (val < arrayTripsPast.length) {
                 trip = arrayTripsPast[val];
             } else {
@@ -73,6 +80,11 @@
                 $('#departTime').html("Error");
             }
             log("Trip changed to " + formatDateToTime(departTime) + " - " +  formatDateToTime(arriveTime),1);
+        });
+
+        $("[name=radio-startTime]").change(function() {
+            log("Radio startTime changed.",1);
+            alert('yup');
         });
 
         $("[name=radio-alarm-state]").change(function() {
@@ -91,7 +103,7 @@
                 alarmType = 2;
             else
                 alarmType = 3;
-            log("Alarm type is now" + alarmType,1);
+            log("Alarm type is now " + alarmType,1);
         });
 
         $('#select-depart').change(function() {
@@ -129,7 +141,7 @@
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
                 <div style="float:left;height: 10px;margin-top: 9px;">Start</div>
                 <div style="float:right;margin-bottom: 13px;height: 10px;font-size: 8px;">
-                    <a id="buttonStartTime" href="#pageStartTimes" data-role="button" data-mini="true"><span style="color: #F2C43d;" id="departTime">????</span></a>
+                    <a id="buttonStartTime" href="#pageStartTimes" data-role="button" data-mini="true"  data-rel="dialog"><span style="color: #F2C43d;" id="departTime">????</span></a>
                 </div>
             </div>
 
@@ -237,9 +249,9 @@
     <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
 
-<section id="pageStartTimes" data-role="page"  data-theme="a" data-title="Departures">
+<section id="pageStartTimes" data-role="page"  data-theme="a" data-title="Departures" >
     <header data-role="header"  data-theme="a" style="">
-        <a href="#pageHome" data-icon="arrow-l">Back</a>
+        <!--<a href="#pageHome" data-icon="arrow-l">Back</a>-->
         <h1>Departures</h1>
     </header>
     <div class="content" data-role="content">

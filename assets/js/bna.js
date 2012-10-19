@@ -79,7 +79,7 @@ function loadTripTimes() {
     $("#radioTrips").append("<br/>Past -<br/>");
     for (i=0; i < arrayTripsPast.length; i++) {
         trip = arrayTripsPast[i];
-        str = "<input type='radio' name='radio-startTime' id='radio-startTime-" + i + "' value='" + i + "' />";// + " checked='checked' />"
+        str = "<input type='radio' name='radio-startTime' onchange='$.mobile.changePage( \"index.html\")'  id='radio-startTime-" + i + "' value='" + i + "' />";// + " checked='checked' />"
         str += "<label for='radio-startTime-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
         $("#radioTrips").append(str);
     }
@@ -87,12 +87,12 @@ function loadTripTimes() {
     var cnt = arrayTripsPast.length;
     for (j=0; j < arrayTripsFuture.length; j++) {
         trip = arrayTripsFuture[j];
-        str = "<input type='radio' name='radio-startTime' id='radio-startTime-" + (j+cnt) + "' value='" + (j+cnt) + "' />";// + " checked='checked' />"
+        str = "<input type='radio' name='radio-startTime'  onchange='$.mobile.changePage( \"index.html\")'  id='radio-startTime-" + (j+cnt) + "' value='" + (j+cnt) + "' />";// + " checked='checked' />"
         str += "<label for='radio-startTime-" + (j+cnt) + "'> " + formatDateToTime(trip[0]) + "</label>";
         $("#radioTrips").append(str);
     }
     cnt=arrayTripsPast.length + arrayTripsFuture.length;
-    log("Loaded " + cnt + "trips in train selector screen.",1);
+    log("Loaded " + cnt + " trips in train selector screen.",1);
     return cnt;
 }
 
