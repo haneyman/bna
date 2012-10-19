@@ -203,13 +203,13 @@
             </div>
         </div>
     </div>
-    <div id="debugLog" style="overflow:visible;font-size: 12px; color: #C97917;background-color: #fff9df;" ZZdata-role="collapsible">
+    <div id="debugLog" style="overflow:visible;font-size: 16px; color: #C97917;background-color: #fff9df;" ZZdata-role="collapsible">
         <h3>Debug Log</h3>
         <!--<a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;-->
         <a href="#"  onclick="clearLog();">Clear</a>&nbsp;&nbsp;&nbsp;
         <a href="#" onclick="getBartStations();">Load Stations</a>&nbsp;&nbsp;&nbsp;
         <a href="#" onclick="loadStopTimes();">Load Stop Times</a>&nbsp;&nbsp;&nbsp;
-        <a href="#" onclick="getTripTime(stationDepartAbbr,stationArriveAbbr,getCurrentTimeHHMMSS());">Trip Time</a>&nbsp;&nbsp;&nbsp;
+        <a href="#" onclick="getTripTime(stationDepartAbbr,stationArriveAbbr,new Date());">Trip Time</a>&nbsp;&nbsp;&nbsp;
         <a href="#" onclick="alarm();">Alarm</a>&nbsp;&nbsp;&nbsp;
         <a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;
         <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
