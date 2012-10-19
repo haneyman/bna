@@ -1,4 +1,4 @@
-var MINUTES_BEFORE_ARRIVAL = 5;
+var alarmMinutesBefore = 3; //default, should come from cookie
 var isAlarmOn = false; //off, on, ??
 var alarmType = 1; //0=none, 1=alarm, 2=vibrate, 3=both
 var stationDepartAbbr = "";
@@ -68,7 +68,7 @@ function newTrip() {
         } else {
             $('#departTime').html("Error");
         }
-        savePreferences();
+        persistPreferences();
     }
 }
 
@@ -79,7 +79,7 @@ function loadTripTimes() {
     $("#radioTrips").append("<br/>Past -<br/>");
     for (i=0; i < arrayTripsPast.length; i++) {
         trip = arrayTripsPast[i];
-        str = "<input type='radio' name='radio-startTime' onchange='$.mobile.changePage( \"index.html\")'' id='radio-startTime-" + i + "' value='" + i + "' />";// + " checked='checked' />"
+        str = "<input type='radio' name='radio-startTime' onchange='$.mobile.changePage( \"index.html\")' id='radio-startTime-" + i + "' value='" + i + "' />";// + " checked='checked' />"
         str += "<label for='radio-startTime-" + i + "'> " + formatDateToTime(trip[0]) + "</label>";
         $("#radioTrips").append(str);
     }
@@ -87,7 +87,7 @@ function loadTripTimes() {
     var cnt = arrayTripsPast.length;
     for (j=0; j < arrayTripsFuture.length; j++) {
         trip = arrayTripsFuture[j];
-        str = "<input type='radio' name='radio-startTime' onchange='$.mobile.changePage( \"index.html\")'' id='radio-startTime-" + (j+cnt) + "' value='" + (j+cnt) + "' />";// + " checked='checked' />"
+        str = "<input type='radio' name='radio-startTime' onchange='$.mobile.changePage( \"index.html\")' id='radio-startTime-" + (j+cnt) + "' value='" + (j+cnt) + "' />";// + " checked='checked' />"
         str += "<label for='radio-startTime-" + (j+cnt) + "'> " + formatDateToTime(trip[0]) + "</label>";
         $("#radioTrips").append(str);
     }
@@ -100,6 +100,8 @@ function loadTripTimes() {
 
 
 function log(msg, level) {
+    if (level == null || level == undefined)
+        level = 1;
     if (isDebug) {
         if (level >= debugLevel) {
             //if ($('#log').is(':visible') )
@@ -215,12 +217,12 @@ function updateAlarmDisplay() {
     $('#imagePulse').fadeIn('slow', function() {
         $('#imagePulse').fadeOut('slow');
     });
-    if (diff < MINUTES_BEFORE_ARRIVAL * 1000 * 60) {
+    if (diff < alarmMinutesBefore * 1000 * 60) {
         //if (diff < 0)
         //    $('#timeRemaining').html("ARRIVED");
         //else
 //        $("#timeRemaining").effect( "pulsate",{times:5}, 3000 );
-        log(" time remaining less than " + MINUTES_BEFORE_ARRIVAL,1);
+        log(" time remaining less than " + alarmMinutesBefore,1);
         alarm();
     } else {
         timeout=setTimeout(function(){updateAlarmDisplay()},5000);
@@ -325,17 +327,27 @@ function playStream(url) {
 //******** END - audio
 
 //**** BEGIN Cookie stuff ******
-function savePreferences() {
-    log("Saving preferences " + stationDepartAbbr + " and " + stationArriveAbbr,1);
+function persistPreferences() {
+    log("Saving preferences to cookie..." + stationDepartAbbr + " and " + stationArriveAbbr + ", type:" + alarmType + "  min:" + alarmMinutesBefore,1);
     $.cookie('bna_cookie_depart', stationDepartAbbr);
     $.cookie('bna_cookie_arrive', stationArriveAbbr);
-    log("   preferences saved.",1)
+    $.cookie('bna_cookie_alarmType', alarmType);
+    $.cookie('bna_cookie_alarmMinutesBefore', alarmMinutesBefore);
+    log("   preferences saved.",1);
 }
 
 function loadPreferences() {
     log("Loading preferences...",1)
+    //load data from cookies
     stationDepartAbbr = $.cookie('bna_cookie_depart');
     stationArriveAbbr = $.cookie('bna_cookie_arrive');
+    alarmType = $.cookie('bna_cookie_alarmType');
+    if (alarmType == null)
+        alarmType = 1;
+    alarmMinutesBefore = $.cookie('bna_cookie_alarmMinutesBefore');
+    if (alarmMinutesBefore == null)
+        alarmMinutesBefore = 3;
+
     if (stationDepartAbbr != null && stationDepartAbbr != "")
         $("#select-depart").val(stationDepartAbbr).selectmenu("refresh", true);
     if (stationArriveAbbr != null && stationArriveAbbr != "")
@@ -343,8 +355,45 @@ function loadPreferences() {
 
     log("stationDepartAbbr preference loaded: " + stationDepartAbbr,1);
     log("stationArriveAbbr preference loaded: " + stationArriveAbbr,1);
+    log("alarmMinutesBefore preference loaded: " + alarmMinutesBefore,1);
+    log("alarmType preference loaded: " + alarmType,1);
+
     log("  Preferences loaded, calling newTrip.",1);
     newTrip();
+}
+
+
+function saveSettings() {
+    log("saving Settings... ",1);
+
+    if ( $('#radio-alarmtype-noise').attr("checked")=="checked")
+        alarmType = 1;
+    else if ( $('#radio-alarmtype-vibrate').attr("checked")=="checked")
+        alarmType = 2;
+    else
+        alarmType = 3;
+    log("Alarm type:" + alarmType,1);
+
+    alarmMinutesBefore = $("#sliderAlarmMintesBefore").val();
+    log("Alarm minutes before:" + alarmMinutesBefore,1);
+
+    persistPreferences();
+    log("Settings saved.",1);
+}
+
+function loadSettings() {
+    log("Loading settings...",1);
+
+    if (alarmType == 1)
+        $('#radio-alarmtype-noise').prop("checked",true).checkboxradio("refresh");
+    else if (alarmType == 2)
+        $('#radio-alarmtype-vibrate').prop("checked",true).checkboxradio("refresh");
+    else
+        $('#radio-alarmtype-both').prop("checked",true).checkboxradio("refresh");
+
+
+    $("#sliderAlarmMintesBefore").val(alarmMinutesBefore);
+    log("Settings loaded.",1);
 }
 
 //**** END Cookie stuff ******

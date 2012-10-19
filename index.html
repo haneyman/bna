@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="assets/css/bna.css" type="text/css" media="screen" />
 <script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+<!--<script src="assets/js/jquery.mobile-1.1.1.min.js" type="text/javascript" charset="utf-8"></script>-->
+<script src="assets/js/jquery.mobile-1.2.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.csv.js" type="text/javascript" charset="utf-8"></script>
 <script src="assets/js/jquery.cookie.js"></script>
 <script src="assets/js/bna.js" type="text/javascript" charset="utf-8"></script>
@@ -20,6 +21,11 @@
         $('#debugLog').hide();
 
         //event for when pageStartTimes SHOWS
+        $( '#pageSettings' ).live( 'pagebeforeshow',function(event, ui){
+            log("pageSettings pagebeforeshow ",1);
+            loadSettings();
+        });
+
         $( '#pageStartTimes' ).live( 'pagebeforeshow',function(event, ui){
             log("pageStartTimes pagebeforeshow departTime is " + formatDateToTime(departTime),1);
             //var depart = formatDateToTime(departTime);
@@ -96,6 +102,8 @@
                 alarmOff();
         });
 
+/* moved to saveSettings()
+
         $("[name=radio-alarmtype]").change(function() {
             if ( $('#radio-alarmtype-noise').attr("checked")=="checked")
                 alarmType = 1;
@@ -106,6 +114,7 @@
             log("Alarm type is now " + alarmType,1);
         });
 
+*/
         $('#select-depart').change(function() {
             newTrip();
         });
@@ -113,6 +122,10 @@
             newTrip();
         });
 
+        $( "#sliderAlarmMintesBefore" ).on( 'slidestop', function( event ) {
+            var val = $( "#sliderAlarmMintesBefore").val();
+            log("slider change to: " + val,1);
+        });
         //initializations
         //$('#debugLog').trigger( "expand" );
         //switchAlarm(false);
@@ -130,9 +143,9 @@
 </head>
 <body>
 <section id="pageHome" data-role="page" data-fullscreen="true" data-theme="a">
-    <header data-role="header" data-id="header"  data-theme="d">
+    <header data-role="header" data-id="header"  ondblclick="$('#topLogo').toggle();" data-theme="d">
         <div style="text-align:center">
-            <img src="assets/img/logoTrans.png" height="45px;">
+            <img src="assets/img/logoTrans.png" id="topLogo" height="45px;">
         </div>
     </header>
     <div class="content" data-role="content" style="margin-left: 5px;width:300px;">
@@ -167,17 +180,19 @@
 
         <!--<button onclick="newTrip();">Get Time</button>-->
 
+<!--
         <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
-            <!--<div style="">Alarm Type</div>-->
-            <!--<div>-->
+            &lt;!&ndash;<div style="">Alarm Type</div>&ndash;&gt;
+            &lt;!&ndash;<div>&ndash;&gt;
                 <input  style="" type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise" checked="checked" />
                 <label for="radio-alarmtype-noise" style="width:95px;">Alarm</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
                 <label for="radio-alarmtype-vibrate" style="width:95px;">Vibrate</label>
                 <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
                 <label for="radio-alarmtype-both" style="width:95px;">Both</label>
-            <!--</div>-->
+            &lt;!&ndash;</div>&ndash;&gt;
         </fieldset>
+-->
 
 
         <div data-role="fieldcontain" style="">
@@ -191,6 +206,10 @@
             </fieldset>
         </div>
 
+        <a id="buttonAlarmSettings" href="#pageSettings" data-role="button" data-mini="true"
+           data-rel="dialog" data-icon="gear">Settings</a>
+
+
         <div id="alarmStatus" style="">
             <!--<a data-corners="true" data-shadow="true" data-wrapperels="span" class="ui-shadow ui-btn-corner-all">29 min </a>-->
             <div class="ui-bar ui-bar-e" style="">
@@ -203,6 +222,7 @@
             </div>
         </div>
     </div>
+
     <div id="debugLog" style="overflow:visible;font-size: 16px; color: #C97917;background-color: #fff9df;" ZZdata-role="collapsible">
         <h3>Debug Log</h3>
         <!--<a href="#pageDebug">debug</a>&nbsp;&nbsp;&nbsp;-->
@@ -214,16 +234,17 @@
         <a href="#" onclick="alarmOff();">Alarm Off</a>&nbsp;&nbsp;&nbsp;
         <div id="log"  style="height: 200px;overflow: scroll;overflow-x:hidden;background-color: #111111; font-size: 12px; color: #C6E746;"></div>
     </div>
+
     <footer data-role="footer" data-id="footer"  data-position="fixed" style="height:35px;padding: 5px;">
         <div style="float:left;">
-            <a href="http://www.mtsconsulting.biz/bna/aboutLink"  data-role="button" data-mini="true" ><span style="font-size: 10px;color: #b0c4de;font-style: italic;">by MTS</span></a>
+            <a href="#pageAbout"  data-rel="dialog" data-role="button" data-mini="true" ><span style="font-size: 10px;color: #b0c4de;font-style: italic;">About</span></a>
             <a id="buttonDebug" href="#" data-role="button" data-mini="true" onclick="$('#debugLog').toggle();">DEBUG</a>
         </div>
         <div style="float:right;margin-right: 10px;">
             <a href="#pageMap"  ZZdata-rel="dialog" data-role="button">BART Map</a>
         </div>
         <div style="float:left;margin-left: 50px;margin-top: 10px;color:#a46312;">
-            v0.1
+            v0.2
         </div>
     </footer>
 </section>
@@ -233,8 +254,38 @@
         <a href="#pageHome" data-icon="arrow-l">Back</a>
         <h1>BART Map</h1>
     </header>
-    <div class="content" data-role="content">
+    <div class="content" data-role="content" style="overflow-style: scrollbar">
         <p><img src="assets/img/system-map.gif"></p>
+    </div>
+    <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
+</section>
+
+<section id="pageSettings" data-role="page">
+    <header data-role="header">
+        <!--<a href="#pageHome" data-icon="arrow-l">Back</a>-->
+        <h1>Settings</h1>
+    </header>
+    <div class="content" data-role="content">
+        <fieldset id="alarmtype" style="" data-role="controlgroup" data-type="horizontal">
+            <!--<div style="">Alarm Type</div>-->
+            <!--<div>-->
+            Type of alarm:<br/>
+            <input  style="" type="radio" name="radio-alarmtype" id="radio-alarmtype-noise" value="choice-alarmtype-noise"  />
+            <label for="radio-alarmtype-noise" style="width:95px;">Alarm</label>
+            <input type="radio" name="radio-alarmtype" id="radio-alarmtype-vibrate" value="choice-alarmtype-vibrate"  />
+            <label for="radio-alarmtype-vibrate" style="width:95px;">Vibrate</label>
+            <input type="radio" name="radio-alarmtype" id="radio-alarmtype-both" value="choice-alarmtype-both"  />
+            <label for="radio-alarmtype-both" style="width:95px;">Both</label>
+            <!--</div>-->
+        </fieldset>
+
+        <div style="margin-top: 50px;">
+            <label for="sliderAlarmMintesBefore">Minutes before stop to sound alarm:</label>
+            <input type="range" name="sliderAlarmMintesBefore" id="sliderAlarmMintesBefore"
+                   value="5" min="0" max="30" />
+        </div>
+
+        <a onclick='saveSettings();' data-role="button" data-rel="back">OK</a>
     </div>
     <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
@@ -245,6 +296,22 @@
         <div id="geolocation">
         </div>
         <a href="#" id="" onclick="alarm()">Alarm</a>
+    </div>
+    <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
+</section>
+
+<section id="pageAbout" data-role="page" data-theme="B">
+    <header data-role="header"><h1>About Page</h1></header>
+    <div class="content" data-role="content">
+
+        <div >
+            Conceived and designed by <a href="mailto:<zvukdesigns@gmail.com>">Ryan Dempsey</a> at Zvuk Designs.
+        </div>
+        <div style="margin-top:50px;">
+            Programming by MPH at
+            <a href="http://www.mtsconsulting.biz/bna/aboutLink" >MTS Consulting</a>
+            <div style="margin-top:50px;">Constructed using Phonegap, JQuery Mobile, HTML5.</div>
+        </div>
     </div>
     <!--<footer data-role="footer" ZZdata-position="fixed"><h1>MTS</h1></footer>-->
 </section>
