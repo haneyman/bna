@@ -82,10 +82,10 @@
             log("Trip changed to " + formatDateToTime(departTime) + " - " +  formatDateToTime(arriveTime),1);
         });
 
-        $("[name=radio-startTime]").change(function() {
+/*  not working, see bna.js for event      $("[name=radio-startTime]").change(function() {
             log("Radio startTime changed.",1);
             alert('yup');
-        });
+        });*/
 
         $("[name=radio-alarm-state]").change(function() {
             isAlarmOn = $('#radio-alarm-on').attr("checked")=="checked";
