@@ -150,11 +150,17 @@
     </header>
     <div class="content" data-role="content" style="margin-left: 5px;width:300px;">
         <div style="margin-top: 5px;">
-            <div  style="height: 10px;" >
+            <a style="float:right;" id="buttonAlarmSettings" href="#pageSettings" data-role="button" data-mini="true"
+               data-rel="dialog" data-icon="gear"> &nbsp;&nbsp;</a>
+            <div style="float:left;width:300px;">
+        </div>
+        <div style="margin-top: 5px;">
+            <div  style="height: 10px;">
                 <!--<label for="select-depart" ondblclick="$('#debugLog').show();">Start</label>-->
                 <div style="float:left;height: 10px;margin-top: 9px;">Start</div>
-                <div style="float:right;margin-bottom: 13px;height: 10px;font-size: 8px;">
-                    <a id="buttonStartTime" href="#pageStartTimes" data-role="button" data-mini="true"  data-rel="dialog"><span style="color: #F2C43d;" id="departTime">????</span></a>
+                <div style="float:left;margin-left:20px;margin-bottom: 13px;height: 10px;font-size: 8px;">
+                    <a id="buttonStartTime" href="#pageStartTimes" data-role="button" data-mini="true"  data-rel="dialog">
+                        <span style="color: #F2C43d;" id="departTime">????</span></a>
                 </div>
             </div>
 
@@ -165,11 +171,11 @@
         </div>
         <div style="">
             <div  style="height: 10px;">
-                <div style="float:left;height: 10px;margin-top:5px;margin-bottom: 2px"  ondblclick="testGetTrip();">
+                <div style="float:left;height: 12px;margin-top:0px;margin-bottom: 2px"  ondblclick="testGetTrip();">
                     End
                 </div>
-                <div style="float:right;height: 10px;">
-                    <span class="arriveTime" style="font-size: 12px;color: #F2C43d;"></span>
+                <div style="float:left;height: 12.5px;margin-left: 35px;">
+                    <span class="arriveTime" style="font-size: 13px;font-weight: bold;color: #F2C43d;"></span>
                 </div>
             </div>
             <div style="" data-role="fieldcontain">
@@ -205,9 +211,6 @@
                 <label for="radio-alarm-off" style="color:red;width:142px;">Alarm OFF</label>
             </fieldset>
         </div>
-
-        <a id="buttonAlarmSettings" href="#pageSettings" data-role="button" data-mini="true"
-           data-rel="dialog" data-icon="gear">Settings</a>
 
 
         <div id="alarmStatus" style="">

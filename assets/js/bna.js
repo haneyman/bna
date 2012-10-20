@@ -19,7 +19,7 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = false;  /// can also use the script at the bottom of index.html to send console to build.phonegap.com
+var isDebug = true;  /// can also use the script at the bottom of index.html to send console to build.phonegap.com
 var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
 var stopTimesFilenameURL = "gtfs/stop_times.txt";
 var stationsURL = "gtfs/stops.txt";
@@ -482,9 +482,9 @@ function getTripTime(orig, dest, targetDateTime ) {
     var stopTimeDepartDateTime = new Date();
     //get target day of week
     var targetDayOfWeek = dayNames[targetDateTime.getDay()]
-    var mm = $.trim(targetDateTime.getMonth() + 1);//zero based for some bizarre reason
-    if (mm.length == 1)
-        mm = "0" + mm;
+    var MM = $.trim(targetDateTime.getMonth() + 1);//zero based for some bizarre reason
+    if (MM.length == 1)
+        MM = "0" + MM;
     var dd = $.trim(targetDateTime.getDate());
     if (dd.length == 1)
         dd = "0" + dd;
@@ -499,11 +499,15 @@ function getTripTime(orig, dest, targetDateTime ) {
         if (stopTimeDepartTime.length == 7)
             stopTimeDepartTime = "0" + stopTimeDepartTime;//javascript requires hh format or craps out
 
-        timeString = targetDateTime.getFullYear() + "-" + mm + "-" + dd + " " + stopTimeDepartTime;
-        stopTimeDepartDateTime = new Date(Date.parse(timeString));
+        //timeString = targetDateTime.getFullYear() + "-" +var hh = stopTimeDepartTime[0] + stopTimeDepartTime[1];
+        //stopTimeDepartDateTime = new Date(mm + "-" + dd + " " + stopTimeDepartTime);
+        var hh = stopTimeDepartTime[0] + stopTimeDepartTime[1];
+        var mm = stopTimeDepartTime[3] + stopTimeDepartTime[4];
+        stopTimeDepartDateTime = new Date(targetDateTime.getFullYear(), targetDateTime.getMonth(),
+            targetDateTime.getDate(), hh, mm);
         stopTimeStopId = stopTime[3];
         stopTimeSequence = stopTime[4];
-        if (i < 0)
+        if (i < 100)
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,1);
         else
             log("StopTimes record " + i + " - " + "   trip_id: " + stopTimeTripId + "  station: " + stopTimeStopId + "  time:" + stopTime[1] + "  sequence: " + stopTimeSequence,0);
@@ -512,7 +516,7 @@ function getTripTime(orig, dest, targetDateTime ) {
             if (stopTimeTripId == inRouteTripId) { //still the same trip
                 if (parseInt(stopTimeSequence) > parseInt(inRouteDepartSequence)) {  //sequence is higher
                     if (stopTimeStopId == dest) {  //found dest, we have a potential trip
-                        //log("     trip found id:" + inRouteTripId + "  " + formatDateToTime(inRouteDepartTime)
+                        log("     trip found id:" + inRouteTripId + "  " + inRouteDepartTime,1);
                         //    + " - " +  formatDateToTime(stopTimeDepartDateTime),1);
                         if (inRouteDepartTime == null || inRouteDepartTime == undefined || typeof inRouteDepartTime != 'object') {
                             log("    found dest but inRouteDepartTime is bad: " + inRouteDepartTime + "  id:" + stopTimeTripId,1);
@@ -529,7 +533,7 @@ function getTripTime(orig, dest, targetDateTime ) {
                                 if ((targetDateTime - inRouteDepartTime)/1000/60 < 60) {
                                     trip = [inRouteDepartTime, stopTimeDepartDateTime];
                                     arrayTripsPast.push(trip);
-                                    //log("     Past trip found.",1);
+                                    log("     Past trip found.",1);
                                     if (inRouteDepartTime > departTime) {
                                         arriveTime = stopTimeDepartDateTime;//remember the Date
                                         departTime = inRouteDepartTime;
@@ -559,6 +563,7 @@ function getTripTime(orig, dest, targetDateTime ) {
                     inRouteDepartSequence = stopTimeSequence;
                     inRouteTripId = stopTimeTripId;
                     inRouteDepartTime = stopTimeDepartDateTime;
+                    log("Origin found, id: " + inRouteTripId + "  time: " + inRouteDepartTime);
                     //Add this to list of future potential trips
                 } else {
                     log("  stop does not match origin ",0);
@@ -580,7 +585,7 @@ function getTripTime(orig, dest, targetDateTime ) {
     } else {
         log("ERROR - No trip found.",2);
         log("getTripTime done.",1);
-        alert("ERROR - Could not find a trip in the BART schedule.");
+        //alert("ERROR - Could not find a trip in the BART schedule.");
         return null;
     }
 }
