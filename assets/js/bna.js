@@ -19,7 +19,7 @@ var timeout;//holds setTimeout
 var alarmFileURL = "assets/audio/alarmBig.mp3";
 var alarmAudio;//for audio instance
 //
-var isDebug = true;  /// can also use the script at the bottom of index.html to send console to build.phonegap.com
+var isDebug = false;  /// can also use the script at the bottom of index.html to send console to build.phonegap.com
 var debugLevel = 1;//0-detailed, 1-less detailed, 2-summary level
 var stopTimesFilenameURL = "gtfs/stop_times.txt";
 var stationsURL = "gtfs/stops.txt";
